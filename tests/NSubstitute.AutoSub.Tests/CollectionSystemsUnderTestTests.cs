@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using NSubstitute.AutoSub.Tests.TestClasses.Collections;
 using NSubstitute.AutoSub.Tests.TestClasses.Collections.Interfaces;
+using NSubstitute.AutoSub.Tests.TestClasses.Implementations;
 using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
 using Xunit;
 
@@ -64,5 +65,25 @@ public class CollectionSystemsUnderTestTests
 
         //Assert
         Assert.Equal($"{item}", result);
+    }
+    
+    
+    [Theory]
+    [InlineData(typeof(ReadOnlyCollectionSystemUnderTest))]
+    [InlineData(typeof(EnumerableSystemUnderTest))]
+    [InlineData(typeof(ListCollectionSystemUnderTest))]
+    [InlineData(typeof(CollectionSystemUnderTest))]
+    public void SimpleSystemUnderTest_WhenGivenMultipleImplementations_WillReturnImplementationsResult(Type value)
+    {
+        //Arrange
+        AutoSubstitute.UseSubstituteCollection<IStringGenerationDependency>(new HelloStringGenerationDependency(),
+            new WorldStringGenerationDependency());
+
+        //Act
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
+        var result = sut.Generate();
+
+        //Assert
+        Assert.Equal($"{HelloStringGenerationDependency.HelloText} {WorldStringGenerationDependency.WorldText}", result);
     }
 }
