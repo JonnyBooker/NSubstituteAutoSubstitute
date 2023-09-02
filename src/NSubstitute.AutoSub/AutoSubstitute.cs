@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +20,10 @@ public class AutoSubstitute : IServiceProvider
         _behaviour = behaviour;
         _searchPrivateConstructors = usePrivateConstructors;
     }
-    
+
     public T SubstituteForNoCache<T>() where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), true);
-    
+
     public T SubstituteForPartsOfNoCache<T>() where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), true);
 
@@ -53,9 +52,8 @@ public class AutoSubstitute : IServiceProvider
         return (T)CreateInstance(typeof(T));
     }
 
-    public object CreateInstance(Type type)
+    public object CreateInstance(Type instanceType)
     {
-        var instanceType = type;
         var bindingFlags = !_searchPrivateConstructors ? BindingFlags.Instance | BindingFlags.Public : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         var potentialConstructors = instanceType
@@ -75,15 +73,16 @@ public class AutoSubstitute : IServiceProvider
             if (_behaviour == SubstituteBehaviour.Strict)
             {
                 var allParametersContained = constructorParameters
-                    .Where(x => !x.IsArray)
+                    .Where(x => !x.IsCollection())
                     .All(type => currentMockTypes.Contains(type));
 
                 var collectionParameters = constructorParameters
-                    .Where(x => x.IsGenericType)
+                    .Where(x => x.IsCollection())
                     .ToArray();
                 var allCollectionParametersContained = collectionParameters
-                    .Select(x => x.GetElementType())
-                    .All(type => currentMockTypes.Contains(type));
+                    .Select(x => x.GetUnderlyingCollectionType())
+                    .Where(x => x is not null)
+                    .All(t => currentMockTypes.Contains(t!));
 
                 if (allParametersContained && (collectionParameters.Any() && allCollectionParametersContained))
                 {
@@ -97,7 +96,7 @@ public class AutoSubstitute : IServiceProvider
                 if (IsValidConstructor(potentialConstructor, out var mockedConstructorArguments))
                 {
                     bestConstructor = potentialConstructor;
-                    constructorArguments = mockedConstructorArguments;
+                    constructorArguments = mockedConstructorArguments!;
                     break;
                 }
 
@@ -114,7 +113,7 @@ public class AutoSubstitute : IServiceProvider
         return bestConstructor.Invoke(constructorArguments ?? Array.Empty<object>());
     }
 
-    private bool IsValidConstructor(ConstructorInfo potentialConstructor, out object[]? mockedConstructorArguments)
+    private bool IsValidConstructor(ConstructorInfo potentialConstructor, out object?[]? mockedConstructorArguments)
     {
         var constructorParameters = potentialConstructor
             .GetParameters()
@@ -123,21 +122,45 @@ public class AutoSubstitute : IServiceProvider
 
         try
         {
-            var constructorArguments = new object[constructorParameters.Length];
+            object?[] constructorArguments = new object[constructorParameters.Length];
             for (var constructorIndex = 0; constructorIndex < constructorParameters.Length; constructorIndex++)
             {
                 var constructorParameterType = constructorParameters[constructorIndex];
-                var constructorParameterIsCollection = constructorParameterType.IsCollection();
 
+                //Try and find according to the type given from the constructor first
                 var mockExists = TryGetService(constructorParameterType, out var mappedMock);
-                if (!mockExists)
+                
+                //If no mock was found and the type is a collection, check the underlying type of the collection
+                if (!mockExists && constructorParameterType.IsCollection())
                 {
-                    if (constructorParameterIsCollection)
+                    var underlyingCollectionType = constructorParameterType.GetUnderlyingCollectionType() ?? throw new Exception("Mer");
+                    mockExists = TryGetService(underlyingCollectionType, out mappedMock);
+
+                    //If a single mock is found, wrap it up in a collection and make it the mapped mock
+                    if (mockExists)
                     {
-                        var underlyingType = constructorParameterType.GetUnderlyingCollectionType();
-                        constructorParameterType = underlyingType ?? throw new Exception("Unable to create mock for collection type");
+                        var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
+                        emptyCollectionArgument.Add(mappedMock);
+                        mappedMock = emptyCollectionArgument;
                     }
-                    
+                    else
+                    {
+                        //If the mock doesn't exist and we are behaving in a non strict way, create an empty collection
+                        switch (_behaviour)
+                        {
+                            case SubstituteBehaviour.LooseFull:
+                            case SubstituteBehaviour.LooseParts:
+                                var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
+                                mappedMock = emptyCollectionArgument;
+                                mockExists = true;
+                                break;
+                        }
+                    }
+                }
+
+                //If haven't found a mock and the behaviour is loose, create a mock to use
+                if (!mockExists && _behaviour != SubstituteBehaviour.Strict)
+                {
                     mappedMock = CreateSubstitute(constructorParameterType, () =>
                     {
                         switch (_behaviour)
@@ -145,7 +168,7 @@ public class AutoSubstitute : IServiceProvider
                             case SubstituteBehaviour.LooseFull:
                                 return Substitute.For(new[] { constructorParameterType }, Array.Empty<object>());
                             case SubstituteBehaviour.LooseParts:
-                                return constructorParameterType!.IsInterface
+                                return constructorParameterType.IsInterface
                                     ? Substitute.For(new[] { constructorParameterType }, Array.Empty<object>())
                                     : typeof(Substitute)
                                         .GetMethod(nameof(Substitute.ForPartsOf))!
@@ -156,25 +179,18 @@ public class AutoSubstitute : IServiceProvider
                         }
                     });
                 }
-                
-                if (!mockExists && constructorParameterIsCollection)
-                {
-                    var collectionArgument = constructorParameterType.CreateListForType();
-                    collectionArgument.Add(mappedMock);
-                    constructorArguments[constructorIndex] = collectionArgument;
-                }
-                else
-                {
-                    constructorArguments[constructorIndex] = mappedMock;
-                }
+
+                //Will be null passed through if it is strict behaviour
+                constructorArguments[constructorIndex] = mappedMock;
             }
 
+            //Made it out without issue, this constructor is suitable
             mockedConstructorArguments = constructorArguments;
-
             return true;
         }
         catch (Exception e)
         {
+            //Something went wrong, not going to use this constructor
             mockedConstructorArguments = null;
             return false;
         }
@@ -182,23 +198,46 @@ public class AutoSubstitute : IServiceProvider
 
     private object CreateSubstitute(Type mockType, Func<object> actionCreateSubstitute, bool noCache = false)
     {
+        //If noCache flag is set, the type map is ignored and a entirely new instance is made and not stored
         if (noCache)
         {
             return actionCreateSubstitute();
         }
 
-        if (_typeMap.TryGetValue(mockType, out var mappedMockType))
+        //Check haven't created it before
+        if (TryGetService(mockType, out var mappedMockType) && mappedMockType is not null)
         {
             return mappedMockType;
         }
 
+        //Substitute needs creating
         var mockInstance = actionCreateSubstitute();
         _ = _typeMap.TryAdd(mockType, mockInstance);
 
         return mockInstance;
     }
 
-    private bool TryGetService(Type serviceType, out object mappedMockType) => _typeMap.TryGetValue(serviceType, out mappedMockType);
+    private bool TryGetService(Type serviceType, out object? mappedMockType)
+    {
+        //Try get back according to the specific type give 
+        if (!_typeMap.TryGetValue(serviceType, out mappedMockType))
+        {
+            //If not found, check it isn't a enumerable collection created by this framework
+            if (serviceType.IsCollection())
+            {
+                var underlyingCollectionType = serviceType.GetUnderlyingCollectionType();
+                var enumerableType = typeof(IEnumerable<>).MakeGenericType(underlyingCollectionType);
+
+                return _typeMap.TryGetValue(enumerableType, out mappedMockType);
+            }
+
+            //Nothing found
+            return false;
+        }
+
+        //Found a type in the map
+        return true;
+    }
 
     object? IServiceProvider.GetService(Type serviceType) => TryGetService(serviceType, out var mappedMockType) ? mappedMockType : null;
 }
