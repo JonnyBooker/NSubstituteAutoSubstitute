@@ -6,10 +6,11 @@ namespace NSubstitute.AutoSub.Tests;
 public class SimpleSystemUnderTestTests
 {
     private AutoSubstitute AutoSubstitute { get; } = new();
+    
     private Fixture Fixture { get; } = new();
 
     [Fact]
-    public void SimpleSystemUnderTest_WhenCreatedDuringAct_WillReturnExpectedResult()
+    public void SimpleSystemUnderTest_WhenCreatedDuringAct_WillReturnExpectedMockedResult()
     {
         //Arrange
         var stringValue = Fixture.Create<string>();
@@ -21,14 +22,39 @@ public class SimpleSystemUnderTestTests
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = sut.UppercaseStringGenerationResult();
+        var result = sut.StringGenerationResult();
 
         //Assert
-        Assert.Equal(stringValue.ToUpper(), result);
+        Assert.Equal(stringValue, result);
     }
 
     [Fact]
-    public void SimpleSystemUnderTest_WhenCreatedDuringArrange_WillReturnExpectedResult()
+    public void SimpleSystemUnderTest_WhenCreatedDuringActAndMockMultipleDependencies_WillReturnExpectedMockedResult()
+    {
+        //Arrange
+        var stringValue = Fixture.Create<string>();
+        var intValue = Fixture.Create<int>();
+
+        AutoSubstitute
+            .SubstituteFor<IStringGenerationDependency>()
+            .Generate()
+            .Returns(stringValue);
+
+        AutoSubstitute
+            .SubstituteFor<IIntGenerationDependency>()
+            .Generate()
+            .Returns(intValue);
+
+        //Act
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.CombineStringAndIntGeneration();
+
+        //Assert
+        Assert.Equal($"{stringValue} {intValue}", result);
+    }
+
+    [Fact]
+    public void SimpleSystemUnderTest_WhenCreatedDuringArrange_WillReturnExpectedMockedResult()
     {
         //Arrange
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
@@ -40,32 +66,73 @@ public class SimpleSystemUnderTestTests
             .Returns(stringValue);
 
         //Act
-        var result = sut.UppercaseStringGenerationResult();
+        var result = sut.StringGenerationResult();
 
         //Assert
-        Assert.Equal(stringValue.ToUpper(), result);
+        Assert.Equal(stringValue, result);
     }
 
     [Fact]
-    public void EmptySystemUnderTest_WhenUsed_ReturnsExpectedResult()
+    public void SimpleSystemUnderTest_WhenCreatedDuringArrangeAndMockMultipleDependencies_WillReturnExpectedMockedResult()
+    {
+        //Arrange
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var stringValue = Fixture.Create<string>();
+        var intValue = Fixture.Create<int>();
+
+        AutoSubstitute
+            .SubstituteFor<IStringGenerationDependency>()
+            .Generate()
+            .Returns(stringValue);
+
+        AutoSubstitute
+            .SubstituteFor<IIntGenerationDependency>()
+            .Generate()
+            .Returns(intValue);
+
+        //Act
+        var result = sut.CombineStringAndIntGeneration();
+
+        //Assert
+        Assert.Equal($"{stringValue} {intValue}", result);
+    }
+
+    [Fact]
+    public void SimpleSystemUnderTest_WhenGivenImplementation_WillReturnImplementationResult()
+    {
+        //Arrange
+        AutoSubstitute.UseSubstitute<IStringGenerationDependency>(new HelloStringGenerationDependency());
+
+        //Act
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.StringGenerationResult();
+
+        //Assert
+        Assert.Equal(HelloStringGenerationDependency.HelloText, result);
+    }
+
+    [Fact]
+    public void EmptySystemUnderTest_WhenUsedWithNoMockedDependencies_ReturnsExpectedResult()
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<EmptySystemUnderTest>();
         var result = sut.Generate();
 
         //Assert
-        Assert.Equal("Hello World", result);
+        Assert.Equal(EmptySystemUnderTest.GenerateText, result);
     }
 
-    [Fact]
-    public void EnumerableSystemUnderTest_WhenMockedEnumerableOfDependencies_ReturnsExpectedResult()
+    [Theory]
+    [InlineData(typeof(ReadOnlyCollectionSystemUnderTest))]
+    [InlineData(typeof(EnumerableSystemUnderTest))]
+    public void EnumerableSystemUnderTest_WhenMockedEnumerableOfDependencies_ReturnsAllSubstitutedMockedValues(Type value)
     {
         //Arrange
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteFor<IStringGenerationDependency>(true);
-        var instance2 = AutoSubstitute.SubstituteFor<IStringGenerationDependency>(true);
+        var instance1 = AutoSubstitute.SubstituteForNoCache<IStringGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoCache<IStringGenerationDependency>();
 
         instance1
             .Generate()
@@ -76,27 +143,69 @@ public class SimpleSystemUnderTestTests
         
         AutoSubstitute.UseSubstituteCollection(instance1, instance2);
 
-        var sut = AutoSubstitute.CreateInstance<EnumerableSystemUnderTest>();
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
 
         //Assert
         Assert.Equal($"{item1} {item2}", result);
     }
+
+    [Fact]
+    public void EnumerableSystemUnderTest_WhenUsingSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue()
+    {
+        //Arrange
+        var item1 = Fixture.Create<string>();
+
+        var instance = AutoSubstitute.SubstituteFor<IStringGenerationDependency>();
+
+        instance
+            .Generate()
+            .Returns(item1);
+
+        //Act
+        var sut = AutoSubstitute.CreateInstance<EnumerableSystemUnderTest>();
+        var result = sut.Generate();
+
+        //Assert
+        Assert.Equal($"{item1}", result);
+    }
 }
 
 public class EmptySystemUnderTest
 {
+    public const string GenerateText = "Hello World";
+    
     public string Generate()
     {
-        return "Hello World";
+        return GenerateText;
     }
 }
 
-public class EnumerableSystemUnderTest
+public interface ICollectionSystemUnderTest
+{
+    string Generate();
+}
+
+public class EnumerableSystemUnderTest : ICollectionSystemUnderTest
 {
     private readonly IEnumerable<IStringGenerationDependency> _stringGenerationDependencies;
 
     public EnumerableSystemUnderTest(IEnumerable<IStringGenerationDependency> stringGenerationDependencies)
+    {
+        _stringGenerationDependencies = stringGenerationDependencies;
+    }
+
+    public string Generate()
+    {
+        return string.Join(" ", _stringGenerationDependencies.Select(x => x.Generate()));
+    }
+}
+
+public class ReadOnlyCollectionSystemUnderTest : ICollectionSystemUnderTest
+{
+    private readonly IReadOnlyCollection<IStringGenerationDependency> _stringGenerationDependencies;
+
+    public ReadOnlyCollectionSystemUnderTest(IReadOnlyCollection<IStringGenerationDependency> stringGenerationDependencies)
     {
         _stringGenerationDependencies = stringGenerationDependencies;
     }
@@ -118,19 +227,13 @@ public class SimpleSystemUnderTest
         _intGenerationDependency = intGenerationDependency;
     }
 
-    public string UppercaseStringGenerationResult()
+    public string StringGenerationResult()
     {
         var value = _stringGenerationDependency.Generate();
-        return value.ToUpper();
+        return value;
     }
 
-    public int NegateIntGenerationResult()
-    {
-        var value = _intGenerationDependency.Generate();
-        return -value;
-    }
-
-    public string CombineIntAndStringGeneration()
+    public string CombineStringAndIntGeneration()
     {
         var stringValue = _stringGenerationDependency.Generate();
         var intValue = _intGenerationDependency.Generate();
@@ -141,33 +244,21 @@ public class SimpleSystemUnderTest
 
 public class HelloStringGenerationDependency : IStringGenerationDependency
 {
+    public const string HelloText = "Hello";
+    
     public string Generate()
     {
-        return "Hello";
+        return HelloText;
     }
 }
 
 public class WorldStringGenerationDependency : IStringGenerationDependency
 {
+    public const string WorldText = "World";
+    
     public string Generate()
     {
-        return "World";
-    }
-}
-
-public class EvenIntGenerationDependency : IIntGenerationDependency
-{
-    public int Generate()
-    {
-        return 10;
-    }
-}
-
-public class OddIntGenerationDependency : IIntGenerationDependency
-{
-    public int Generate()
-    {
-        return 5;
+        return WorldText;
     }
 }
 
