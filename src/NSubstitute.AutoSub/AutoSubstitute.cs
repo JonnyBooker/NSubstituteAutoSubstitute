@@ -21,6 +21,12 @@ public class AutoSubstitute : IServiceProvider
         _behaviour = behaviour;
         _searchPrivateConstructors = usePrivateConstructors;
     }
+    
+    public T SubstituteForNoCache<T>() where T : class =>
+        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), true);
+    
+    public T SubstituteForPartsOfNoCache<T>() where T : class =>
+        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), true);
 
     public T SubstituteFor<T>(bool noCache = false) where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), noCache);
@@ -37,14 +43,19 @@ public class AutoSubstitute : IServiceProvider
 
     public void UseSubstituteCollection<T>(params T[] instances) where T : class
     {
-        var instanceType = typeof(IEnumerable<T>);
-        _ = _typeMap.TryRemove(instanceType, out _);
-        _ = _typeMap.TryAdd(instanceType, new List<T>(instances).AsEnumerable());
+        var collectionType = typeof(IEnumerable<T>);
+        _ = _typeMap.TryRemove(collectionType, out _);
+        _ = _typeMap.TryAdd(collectionType, new List<T>(instances).AsEnumerable());
     }
 
     public T CreateInstance<T>()
     {
-        var instanceType = typeof(T);
+        return (T)CreateInstance(typeof(T));
+    }
+
+    public object CreateInstance(Type type)
+    {
+        var instanceType = type;
         var bindingFlags = !_searchPrivateConstructors ? BindingFlags.Instance | BindingFlags.Public : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         var potentialConstructors = instanceType
@@ -100,7 +111,7 @@ public class AutoSubstitute : IServiceProvider
             throw new Exception("Unable to find suitable constructor");
         }
 
-        return (T)bestConstructor.Invoke(constructorArguments ?? Array.Empty<object>());
+        return bestConstructor.Invoke(constructorArguments ?? Array.Empty<object>());
     }
 
     private bool IsValidConstructor(ConstructorInfo potentialConstructor, out object[]? mockedConstructorArguments)
@@ -116,14 +127,15 @@ public class AutoSubstitute : IServiceProvider
             for (var constructorIndex = 0; constructorIndex < constructorParameters.Length; constructorIndex++)
             {
                 var constructorParameterType = constructorParameters[constructorIndex];
+                var constructorParameterIsCollection = constructorParameterType.IsCollection();
 
                 var mockExists = TryGetService(constructorParameterType, out var mappedMock);
                 if (!mockExists)
                 {
-                    var constructorParameterIsCollection = constructorParameterType.IsCollection();
                     if (constructorParameterIsCollection)
                     {
-                        constructorParameterType = constructorParameterType.GetElementType();
+                        var underlyingType = constructorParameterType.GetUnderlyingCollectionType();
+                        constructorParameterType = underlyingType ?? throw new Exception("Unable to create mock for collection type");
                     }
                     
                     mappedMock = CreateSubstitute(constructorParameterType, () =>
@@ -143,17 +155,17 @@ public class AutoSubstitute : IServiceProvider
                                 throw new ArgumentOutOfRangeException();
                         }
                     });
-                    
-                    if (constructorParameterIsCollection)
-                    {
-                        var collectionArgument = constructorParameterType.CreateListForType();
-                        collectionArgument.Add(mappedMock);
-                        constructorArguments[constructorIndex] = (IEnumerable)mappedMock;
-                    }
-                    else
-                    {
-                        constructorArguments[constructorIndex] = mappedMock;
-                    }
+                }
+                
+                if (!mockExists && constructorParameterIsCollection)
+                {
+                    var collectionArgument = constructorParameterType.CreateListForType();
+                    collectionArgument.Add(mappedMock);
+                    constructorArguments[constructorIndex] = collectionArgument;
+                }
+                else
+                {
+                    constructorArguments[constructorIndex] = mappedMock;
                 }
             }
 

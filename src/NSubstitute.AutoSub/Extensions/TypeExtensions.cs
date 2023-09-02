@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace NSubstitute.AutoSub.Extensions;
@@ -20,7 +21,18 @@ internal static class TypeExtensions
     
     internal static IList CreateListForType(this Type type)
     {
-        var existingListType = typeof(List<>).MakeGenericType(type);
-        return (IList)Activator.CreateInstance(type);
+        var existingListType = typeof(Collection<>).MakeGenericType(type);
+        return (IList)Activator.CreateInstance(existingListType);
+    }
+    
+
+    internal static Type? GetUnderlyingCollectionType(this Type type)
+    {
+        if (type.IsArray)
+        {
+            return type.GetElementType();
+        }
+            
+        return type.GetGenericArguments().Single();
     }
 }
