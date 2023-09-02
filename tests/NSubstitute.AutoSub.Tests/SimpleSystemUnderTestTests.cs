@@ -1,5 +1,6 @@
 using AutoFixture;
 using NSubstitute.AutoSub.Tests.TestClasses;
+using NSubstitute.AutoSub.Tests.TestClasses.Implementations;
 using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
 using Xunit;
 
@@ -111,25 +112,5 @@ public class SimpleSystemUnderTestTests
 
         //Assert
         Assert.Equal(HelloStringGenerationDependency.HelloText, result);
-    }
-    
-    private class HelloStringGenerationDependency : IStringGenerationDependency
-    {
-        public const string HelloText = "Hello";
-    
-        public string Generate()
-        {
-            return HelloText;
-        }
-    }
-    
-    private class WorldStringGenerationDependency : IStringGenerationDependency
-    {
-        public const string WorldText = "World";
-    
-        public string Generate()
-        {
-            return WorldText;
-        }
     }
 }
