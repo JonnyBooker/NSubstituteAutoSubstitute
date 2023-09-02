@@ -26,4 +26,8 @@
       <ProjectReference Include="..\..\src\NSubstitute.AutoSub\NSubstitute.AutoSub.csproj" />
     </ItemGroup>
 
+
+
+
+
 </Project>
