@@ -9,7 +9,7 @@ namespace NSubstitute.AutoSub.Tests;
 public class SimpleSystemUnderTestTests
 {
     private AutoSubstitute AutoSubstitute { get; } = new();
-    
+
     private Fixture Fixture { get; } = new();
 
     [Fact]
@@ -113,5 +113,4 @@ public class SimpleSystemUnderTestTests
         //Assert
         Assert.Equal(HelloStringGenerationDependency.HelloText, result);
     }
-    
 }

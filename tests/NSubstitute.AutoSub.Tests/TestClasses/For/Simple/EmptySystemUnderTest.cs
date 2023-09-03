@@ -1,4 +1,4 @@
-﻿namespace NSubstitute.AutoSub.Tests.TestClasses;
+﻿namespace NSubstitute.AutoSub.Tests.TestClasses.Simple;
 
 public class EmptySystemUnderTest
 {
