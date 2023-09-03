@@ -55,6 +55,51 @@ public class ReceivedHelperTests
     }
     
     [Fact]
+    public void ReceivedAtLeastOnce_WhenCalledWithNoParameters_CanVerifyReceivedCallsForMockedDependency()
+    {
+        //Arrange & Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.StringGenerationResult();
+
+        //Assert
+        AutoSubstitute
+            .ReceivedAtLeastOnce<IReceivedHelperTestClassDependency>(x => x.Generate());
+    }
+    
+    [Fact]
+    public void ReceivedAtLeastOnce_WhenCalledWithParameters_CanVerifyReceivedCallsForMockedDependency()
+    {
+        //Arrange 
+        var parameter = Fixture.Create<string>();
+        
+        //Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.CombineWithStringGenerationResult(parameter);
+
+        //Assert
+        AutoSubstitute
+            .ReceivedAtLeastOnce<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter));
+    }
+    
+    [Fact]
+    public void ReceivedAtLeastOnce_WhenCalledMultipleTimes_CanChainVerify()
+    {
+        //Arrange 
+        var parameter1 = Fixture.Create<string>();
+        var parameter2 = Fixture.Create<string>();
+        
+        //Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.CombineWithStringGenerationResult(parameter1);
+        _ = sut.CombineWithStringGenerationResult(parameter2);
+
+        //Assert
+        AutoSubstitute
+            .ReceivedAtLeastOnce<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter1))
+            .ReceivedAtLeastOnce<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter2));
+    }
+    
+    [Fact]
     public void ReceivedTimes_WhenCalledWithNoParameters_CanVerifyReceivedCallsForMockedDependency()
     {
         //Arrange & Act
