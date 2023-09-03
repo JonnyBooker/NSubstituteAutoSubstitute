@@ -28,8 +28,8 @@ public class CollectionPartsOfSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteForNoCache<SimplePartsOfPartsOfDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoCache<SimplePartsOfPartsOfDependency>();
+        var instance1 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
+        var instance2 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
 
         instance1
             .MockedMethod()
@@ -54,7 +54,7 @@ public class CollectionPartsOfSystemsUnderTestTests
         //Arrange
         var item = Fixture.Create<string>();
 
-        var instance = AutoSubstitute.SubstituteFor<SimplePartsOfPartsOfDependency>();
+        var instance = AutoSubstitute.SubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
 
         instance
             .MockedMethod()
