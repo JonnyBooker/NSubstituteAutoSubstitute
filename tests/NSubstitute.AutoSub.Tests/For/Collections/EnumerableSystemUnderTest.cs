@@ -1,7 +1,7 @@
-﻿using NSubstitute.AutoSub.Tests.TestClasses.Collections.Interfaces;
-using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
+﻿using NSubstitute.AutoSub.Tests.For.Collections.Interfaces;
+using NSubstitute.AutoSub.Tests.For.Interfaces;
 
-namespace NSubstitute.AutoSub.Tests.TestClasses.Collections;
+namespace NSubstitute.AutoSub.Tests.For.Collections;
 
 public class EnumerableSystemUnderTest : ICollectionSystemUnderTest
 {

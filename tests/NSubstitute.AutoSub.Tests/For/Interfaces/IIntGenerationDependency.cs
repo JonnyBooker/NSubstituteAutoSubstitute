@@ -1,4 +1,4 @@
-﻿namespace NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
+﻿namespace NSubstitute.AutoSub.Tests.For.Interfaces;
 
 public interface IIntGenerationDependency
 {

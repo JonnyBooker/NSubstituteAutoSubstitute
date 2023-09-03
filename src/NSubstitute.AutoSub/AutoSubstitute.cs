@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -294,9 +295,9 @@ public class AutoSubstitute : IServiceProvider
                     {
                         _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Found single instance for collection mock type. Will use this!");
                         
-                        var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
-                        emptyCollectionArgument.Add(mappedMock);
-                        mappedMock = emptyCollectionArgument;
+                        var mockedCollectionList = underlyingCollectionType.CreateListForType();
+                        mockedCollectionList.Add(mappedMock);
+                        mappedMock = mockedCollectionList;
                     }
                     else
                     {

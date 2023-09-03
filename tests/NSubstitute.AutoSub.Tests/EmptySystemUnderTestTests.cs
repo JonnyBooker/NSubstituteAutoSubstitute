@@ -1,14 +1,10 @@
-﻿using AutoFixture;
-using NSubstitute.AutoSub.Tests.TestClasses;
-using Xunit;
+﻿using Xunit;
 
 namespace NSubstitute.AutoSub.Tests;
 
 public class EmptySystemUnderTestTests
 {
     private AutoSubstitute AutoSubstitute { get; } = new();
-    
-    private Fixture Fixture { get; } = new();
     
     [Fact]
     public void EmptySystemUnderTest_WhenUsedWithNoMockedDependencies_ReturnsExpectedResult()
@@ -19,5 +15,15 @@ public class EmptySystemUnderTestTests
 
         //Assert
         Assert.Equal(EmptySystemUnderTest.GenerateText, result);
+    }
+    
+    private class EmptySystemUnderTest
+    {
+        public const string GenerateText = "Hello World";
+    
+        public string Generate()
+        {
+            return GenerateText;
+        }
     }
 }

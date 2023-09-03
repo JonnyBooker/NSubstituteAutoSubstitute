@@ -1,6 +1,6 @@
-﻿using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
+﻿using NSubstitute.AutoSub.Tests.For.Interfaces;
 
-namespace NSubstitute.AutoSub.Tests.TestClasses.Simple;
+namespace NSubstitute.AutoSub.Tests.For.Simple;
 
 public class SimpleSystemUnderTest
 {

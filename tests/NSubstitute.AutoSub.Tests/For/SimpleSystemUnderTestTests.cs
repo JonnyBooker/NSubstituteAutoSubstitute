@@ -1,10 +1,10 @@
 using AutoFixture;
-using NSubstitute.AutoSub.Tests.TestClasses;
-using NSubstitute.AutoSub.Tests.TestClasses.Implementations;
-using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
+using NSubstitute.AutoSub.Tests.For.Implementations;
+using NSubstitute.AutoSub.Tests.For.Interfaces;
+using NSubstitute.AutoSub.Tests.For.Simple;
 using Xunit;
 
-namespace NSubstitute.AutoSub.Tests;
+namespace NSubstitute.AutoSub.Tests.For;
 
 public class SimpleSystemUnderTestTests
 {
