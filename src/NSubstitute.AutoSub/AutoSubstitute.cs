@@ -20,6 +20,33 @@ public class AutoSubstitute : IServiceProvider
         _behaviour = behaviour;
         _searchPrivateConstructors = usePrivateConstructors;
     }
+    
+    public AutoSubstitute DidNotReceive<T>(Action<T> expression)
+        where T : class
+    {
+        return ReceivedTimes(expression, 0);
+    }
+    
+    public AutoSubstitute ReceivedOnce<T>(Action<T> expression)
+        where T : class
+    {
+        return ReceivedTimes(expression, 1);
+    }
+    
+    public AutoSubstitute ReceivedTimes<T>(Action<T> expression, int times)
+        where T : class
+    {
+        if (TryGetService(typeof(T), out var mockedInstance) && mockedInstance is not null)
+        {
+            var castMockedInstance = (T)mockedInstance;
+            var received = castMockedInstance.Received(times);
+            expression.Invoke(received);
+
+            return this;
+        }
+
+        throw new Exception("");
+    }
 
     public T SubstituteForNoCache<T>() where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), true);

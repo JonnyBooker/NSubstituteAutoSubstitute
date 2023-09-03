@@ -113,4 +113,5 @@ public class SimpleSystemUnderTestTests
         //Assert
         Assert.Equal(HelloStringGenerationDependency.HelloText, result);
     }
+    
 }
