@@ -3,16 +3,34 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NSubstitute.AutoSub.Diagnostics;
+using NSubstitute.AutoSub.Exceptions;
 using NSubstitute.AutoSub.Extensions;
+using NSubstitute.ReceivedExtensions;
 
 namespace NSubstitute.AutoSub;
 
+/// <summary>
+/// An auto-mocking IoC container that generates mock objects using NSubstitute.
+/// </summary>
 public class AutoSubstitute : IServiceProvider
 {
     private readonly ConcurrentDictionary<Type, object> _typeMap;
     private readonly SubstituteBehaviour _behaviour;
     private readonly bool _searchPrivateConstructors;
+    private readonly AutoSubstituteTypeDiagnosticsHandler _diagnosticsHandler = new();
+    
+    /// <summary>
+    /// Tracks are stores usage of types and substitutes during the creation of instances
+    /// </summary>
+    public IAutoSubstituteTypeDiagnosticsHandler DiagnosticsHandler => _diagnosticsHandler;
 
+    /// <summary>
+    /// Creates a container which can create classes which can be tested with automatically
+    /// mocked dependencies
+    /// </summary>
+    /// <param name="behaviour">Determines how substitutes are generated. <see cref="SubstituteBehaviour"/></param>
+    /// <param name="usePrivateConstructors">Check for private constructors to use when creating any instance to test</param>
     public AutoSubstitute(SubstituteBehaviour behaviour = SubstituteBehaviour.LooseParts,
         bool usePrivateConstructors = false)
     {
@@ -21,19 +39,57 @@ public class AutoSubstitute : IServiceProvider
         _searchPrivateConstructors = usePrivateConstructors;
     }
     
+    /// <summary>
+    /// Helper to be able more easily verify a action did not take place
+    /// </summary>
+    /// <param name="expression">Method to verify is not called. Parameters are checked</param>
+    /// <typeparam name="T">The dependency to check a method has not been invoked on</typeparam>
     public AutoSubstitute DidNotReceive<T>(Action<T> expression)
         where T : class
     {
         return ReceivedTimes(expression, 0);
     }
     
+    /// <summary>
+    /// Helper to be able more easily verify a action did take place once
+    /// </summary>
+    /// <param name="expression">Method to verify is called. Parameters are checked</param>
+    /// <typeparam name="T">The dependency to check a method has been invoked on</typeparam>
     public AutoSubstitute ReceivedOnce<T>(Action<T> expression)
         where T : class
     {
         return ReceivedTimes(expression, 1);
     }
     
+    /// <summary>
+    /// Helper to be able more easily verify a action did take place once
+    /// </summary>
+    /// <param name="expression">Method to verify is called. Parameters are checked</param>
+    /// <typeparam name="T">The dependency to check a method has been invoked on</typeparam>
+    public AutoSubstitute ReceivedAtLeastOnce<T>(Action<T> expression)
+        where T : class
+    {
+        return ReceivedTimes(expression, Quantity.AtLeastOne());
+    }
+
+    /// <summary>
+    /// Helper to be able more easily verify a action did take place a defined number of times
+    /// </summary>
+    /// <param name="expression">Method to verify is called. Parameters are checked</param>
+    /// <param name="times">The amount of times a method is expected to be called</param>
+    /// <typeparam name="T">The dependency to check a method has been invoked on</typeparam>
     public AutoSubstitute ReceivedTimes<T>(Action<T> expression, int times)
+        where T : class
+    {
+        return ReceivedTimes(expression, Quantity.Exactly(times));
+    }
+    /// <summary>
+    /// Helper to be able more easily verify a action did take place a defined number of times
+    /// </summary>
+    /// <param name="expression">Method to verify is called. Parameters are checked</param>
+    /// <param name="times">The amount of times a method is expected to be called</param>
+    /// <typeparam name="T">The dependency to check a method has been invoked on</typeparam>
+    public AutoSubstitute ReceivedTimes<T>(Action<T> expression, Quantity times)
         where T : class
     {
         if (TryGetService(typeof(T), out var mockedInstance) && mockedInstance is not null)
@@ -48,18 +104,47 @@ public class AutoSubstitute : IServiceProvider
         throw new Exception("");
     }
 
-    public T SubstituteForNoCache<T>() where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), true);
+    /// <summary>
+    /// Searches or creates a substitute that a system under test can use that is not
+    /// cached and is newly created everytime.
+    /// Underneath this will use <see cref="Substitute.For{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The class or interface to search</typeparam>
+    /// <returns>A substitute for the specified class or interface</returns>
+    public T SubstituteForNoCache<T>() where T : class => SubstituteFor<T>(true);
 
-    public T SubstituteForPartsOfNoCache<T>() where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), true);
+    /// <summary>
+    /// Searches or creates a substitute that a system under test can use that is not
+    /// cached and is newly created everytime.
+    /// Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The class or interface to search</typeparam>
+    /// <returns>A substitute for the specified class or interface</returns>
+    public T SubstituteForPartsOfNoCache<T>() where T : class => SubstituteForPartsOf<T>(true);
 
+    /// <summary>
+    /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.For{T}"/>.
+    /// </summary>
+    /// <param name="noCache">Option if want to create an instance that is newly created and not stored</param>
+    /// <typeparam name="T">The class or interface to search</typeparam>
+    /// <returns>A substitute for the specified class or interface</returns>
     public T SubstituteFor<T>(bool noCache = false) where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), noCache);
 
+    /// <summary>
+    /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
+    /// </summary>
+    /// <param name="noCache">Option if want to create an instance that is newly created and not stored</param>
+    /// <typeparam name="T">The class or interface to search</typeparam>
+    /// <returns>A substitute for the specified class or interface</returns>
     public T SubstituteForPartsOf<T>(bool noCache = false) where T : class =>
         (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), noCache);
 
+    /// <summary>
+    /// Forces a specific type instance to be used over creating a substituted instance automatically
+    /// </summary>
+    /// <param name="instance">The instance to use during the creation of a system under test</param>
+    /// <typeparam name="T">The type of the instance</typeparam>
     public void UseSubstitute<T>(T instance) where T : class
     {
         var instanceType = typeof(T);
@@ -67,6 +152,13 @@ public class AutoSubstitute : IServiceProvider
         _ = _typeMap.TryAdd(instanceType, instance);
     }
 
+    /// <summary>
+    /// Used to be able to provide multiple mock instances for enumerable parameters. This can be
+    /// hard instances or multiple substitute instances that want to be used as part of the system
+    /// under test
+    /// </summary>
+    /// <param name="instances">Instances to be injected into a system under test</param>
+    /// <typeparam name="T">The base/interface type of the instances being passed in</typeparam>
     public void UseSubstituteCollection<T>(params T[] instances) where T : class
     {
         var collectionType = typeof(IEnumerable<T>);
@@ -74,18 +166,39 @@ public class AutoSubstitute : IServiceProvider
         _ = _typeMap.TryAdd(collectionType, new List<T>(instances).AsEnumerable());
     }
 
-    public T CreateInstance<T>()
+    /// <summary>
+    /// Create a class instance to test using the substituted dependencies. Any dependencies not
+    /// mocked will follow the <see cref="SubstituteBehaviour"/> set when this class was created
+    /// </summary>
+    /// <typeparam name="T">The type to create</typeparam>
+    /// <returns>A instance to test according to the type passed in</returns>
+    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed</exception>
+    public T CreateInstance<T>() where T : class
     {
         return (T)CreateInstance(typeof(T));
     }
-
+    
+    /// <summary>
+    /// Create a class instance to test using the substituted dependencies. Any dependencies not
+    /// mocked will follow the <see cref="SubstituteBehaviour"/> set when this class was created.
+    ///
+    /// This will be passed back as a object type.
+    /// </summary>
+    /// <param name="instanceType">The type to create</param>
+    /// <returns>A instance to test according to the instance type passed in, passed back as a generic object</returns>
+    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed</exception>
     public object CreateInstance(Type instanceType)
     {
-        var bindingFlags = !_searchPrivateConstructors ? BindingFlags.Instance | BindingFlags.Public : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        var bindingFlags = !_searchPrivateConstructors ? 
+            BindingFlags.Instance | BindingFlags.Public : 
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         var potentialConstructors = instanceType
             .GetConstructors(bindingFlags)
-            .OrderByDescending(x => x.GetParameters().Length);
+            .OrderByDescending(x => x.GetParameters().Length)
+            .ToList();
+        
+        _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Found {potentialConstructors.Count} potential constructors");
 
         ConstructorInfo? bestConstructor = null;
         object[]? constructorArguments = null;
@@ -96,6 +209,8 @@ public class AutoSubstitute : IServiceProvider
             var constructorParameters = potentialConstructor!.GetParameters()
                 .Select(x => x.ParameterType)
                 .ToArray();
+            
+            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Checking constructor using '{_behaviour.ToString()} behaviour. Parameters: {string.Join(", ", constructorParameters.Select(x => x.Name))}");
 
             if (_behaviour == SubstituteBehaviour.Strict)
             {
@@ -113,6 +228,8 @@ public class AutoSubstitute : IServiceProvider
 
                 if (allParametersContained && (collectionParameters.Any() && allCollectionParametersContained))
                 {
+                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "Found best constructor!");
+                    
                     bestConstructor = potentialConstructor;
                     constructorArguments = new object[constructorParameters.Length];
                     break;
@@ -120,13 +237,17 @@ public class AutoSubstitute : IServiceProvider
             }
             else
             {
-                if (IsValidConstructor(potentialConstructor, out var mockedConstructorArguments))
+                if (IsValidConstructor(instanceType, potentialConstructor, out var mockedConstructorArguments))
                 {
+                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "Found best constructor!");
+                    
                     bestConstructor = potentialConstructor;
                     constructorArguments = mockedConstructorArguments!;
                     break;
                 }
 
+                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Unsuitable constructor...");
+                
                 bestConstructor = null;
                 constructorArguments = null;
             }
@@ -134,13 +255,14 @@ public class AutoSubstitute : IServiceProvider
 
         if (bestConstructor is null)
         {
-            throw new Exception("Unable to find suitable constructor");
+            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "No suitable constructor found for type");
+            throw new AutoSubstituteException("Unable to find suitable constructor");
         }
 
         return bestConstructor.Invoke(constructorArguments ?? Array.Empty<object>());
     }
 
-    private bool IsValidConstructor(ConstructorInfo potentialConstructor, out object?[]? mockedConstructorArguments)
+    private bool IsValidConstructor(Type instanceTypeForConstructor, ConstructorInfo potentialConstructor, out object?[]? mockedConstructorArguments)
     {
         var constructorParameters = potentialConstructor
             .GetParameters()
@@ -153,6 +275,8 @@ public class AutoSubstitute : IServiceProvider
             for (var constructorIndex = 0; constructorIndex < constructorParameters.Length; constructorIndex++)
             {
                 var constructorParameterType = constructorParameters[constructorIndex];
+                
+                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Checking Mock for {constructorParameterType} type");
 
                 //Try and find according to the type given from the constructor first
                 var mockExists = TryGetService(constructorParameterType, out var mappedMock);
@@ -160,12 +284,16 @@ public class AutoSubstitute : IServiceProvider
                 //If no mock was found and the type is a collection, check the underlying type of the collection
                 if (!mockExists && constructorParameterType.IsCollection())
                 {
-                    var underlyingCollectionType = constructorParameterType.GetUnderlyingCollectionType() ?? throw new Exception("Mer");
+                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Mock was collection type, seeing if can find a mocked collection version of type");
+                    
+                    var underlyingCollectionType = constructorParameterType.GetUnderlyingCollectionType() ?? throw new AutoSubstituteException("Unable to get underlying collection type");
                     mockExists = TryGetService(underlyingCollectionType, out mappedMock);
 
                     //If a single mock is found, wrap it up in a collection and make it the mapped mock
                     if (mockExists)
                     {
+                        _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Found single instance for collection mock type. Will use this!");
+                        
                         var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
                         emptyCollectionArgument.Add(mappedMock);
                         mappedMock = emptyCollectionArgument;
@@ -177,6 +305,8 @@ public class AutoSubstitute : IServiceProvider
                         {
                             case SubstituteBehaviour.LooseFull:
                             case SubstituteBehaviour.LooseParts:
+                                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Behaviour was loose so will create an empty collection of dependency type");
+                                
                                 var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
                                 mappedMock = emptyCollectionArgument;
                                 mockExists = true;
@@ -188,6 +318,7 @@ public class AutoSubstitute : IServiceProvider
                 //If haven't found a mock and the behaviour is loose, create a mock to use
                 if (!mockExists && _behaviour != SubstituteBehaviour.Strict)
                 {
+                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Creating a substitute for type: {constructorParameterType}");
                     mappedMock = CreateSubstitute(constructorParameterType, () =>
                     {
                         switch (_behaviour)
@@ -218,6 +349,8 @@ public class AutoSubstitute : IServiceProvider
         catch (Exception e)
         {
             //Something went wrong, not going to use this constructor
+            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Error happened checking eligibility of this constructor. Error: {e.Message}");
+            
             mockedConstructorArguments = null;
             return false;
         }
@@ -228,16 +361,19 @@ public class AutoSubstitute : IServiceProvider
         //If noCache flag is set, the type map is ignored and a entirely new instance is made and not stored
         if (noCache)
         {
+            _diagnosticsHandler.AddDiagnosticMessagesForType(mockType, $"Creating a non cached substitute");
             return actionCreateSubstitute();
         }
 
         //Check haven't created it before
         if (TryGetService(mockType, out var mappedMockType) && mappedMockType is not null)
         {
+            _diagnosticsHandler.AddDiagnosticMessagesForType(mockType, $"Existing substitute found. Will use this!");
             return mappedMockType;
         }
 
         //Substitute needs creating
+        _diagnosticsHandler.AddDiagnosticMessagesForType(mockType, $"Substitute not found. Will create...");
         var mockInstance = actionCreateSubstitute();
         _ = _typeMap.TryAdd(mockType, mockInstance);
 
