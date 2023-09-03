@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using NSubstitute.ReceivedExtensions;
 using Xunit;
 
 namespace NSubstitute.AutoSub.Tests;
@@ -142,6 +143,51 @@ public class ReceivedHelperTests
         AutoSubstitute
             .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter1), 1)
             .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter2), 1);
+    }
+    
+    [Fact]
+    public void ReceivedTimes_WhenCalledWithNoParameters_CanVerifyReceivedQuantityCallsForMockedDependency()
+    {
+        //Arrange & Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.StringGenerationResult();
+
+        //Assert
+        AutoSubstitute
+            .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.Generate(), Quantity.Exactly(1));
+    }
+    
+    [Fact]
+    public void ReceivedTimes_WhenCalledWithParameters_CanVerifyReceivedQuantityCallsForMockedDependency()
+    {
+        //Arrange 
+        var parameter = Fixture.Create<string>();
+        
+        //Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.CombineWithStringGenerationResult(parameter);
+
+        //Assert
+        AutoSubstitute
+            .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter), Quantity.Exactly(1));
+    }
+    
+    [Fact]
+    public void ReceivedTimes_WhenCalledMultipleTimes_CanChainVerifyQuantity()
+    {
+        //Arrange 
+        var parameter1 = Fixture.Create<string>();
+        var parameter2 = Fixture.Create<string>();
+        
+        //Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.CombineWithStringGenerationResult(parameter1);
+        _ = sut.CombineWithStringGenerationResult(parameter2);
+
+        //Assert
+        AutoSubstitute
+            .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter1), Quantity.Exactly(1))
+            .ReceivedTimes<IReceivedHelperTestClassDependency>(x => x.CombinedWith(parameter2), Quantity.Exactly(1));
     }
     
     [Fact]
