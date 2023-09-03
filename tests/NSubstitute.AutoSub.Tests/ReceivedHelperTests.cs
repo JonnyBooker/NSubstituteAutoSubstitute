@@ -126,6 +126,22 @@ public class ReceivedHelperTests
             .DidNotReceive<IReceivedHelperTestClassDependency>(x => x.CombinedWith(Fixture.Create<string>()));
     }
     
+    [Fact]
+    public void DidNotReceive_WhenCalledMultipleTimes_CanChainVerify()
+    {
+        //Arrange 
+        var parameter = Fixture.Create<string>();
+        
+        //Act
+        var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
+        _ = sut.CombineWithStringGenerationResult(parameter);
+
+        //Assert
+        AutoSubstitute
+            .DidNotReceive<IReceivedHelperTestClassDependency>(x => x.CombinedWith(Fixture.Create<string>()))
+            .DidNotReceive<IReceivedHelperTestClassDependency>(x => x.CombinedWith(Fixture.Create<string>()));
+    }
+    
     private class ReceivedHelperTestClass
     {
         private readonly IReceivedHelperTestClassDependency _receivedHelperTestClassDependency;
