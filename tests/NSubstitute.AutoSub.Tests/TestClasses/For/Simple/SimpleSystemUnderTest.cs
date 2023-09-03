@@ -1,6 +1,6 @@
 ﻿using NSubstitute.AutoSub.Tests.TestClasses.Interfaces;
 
-namespace NSubstitute.AutoSub.Tests.TestClasses;
+namespace NSubstitute.AutoSub.Tests.TestClasses.Simple;
 
 public class SimpleSystemUnderTest
 {

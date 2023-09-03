@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -25,7 +24,6 @@ internal static class TypeExtensions
         return (IList)Activator.CreateInstance(existingListType);
     }
     
-
     internal static Type? GetUnderlyingCollectionType(this Type type)
     {
         if (type.IsArray)

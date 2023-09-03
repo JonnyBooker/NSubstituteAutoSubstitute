@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace NSubstitute.AutoSub.Diagnostics;
 
-public class AutoSubstituteTypeDiagnosticsHandler : IAutoSubstituteTypeDiagnosticsHandler
+internal class AutoSubstituteTypeDiagnosticsHandler : IAutoSubstituteTypeDiagnosticsHandler
 {
     private readonly IDictionary<Type, IList<string>> _diagnosticMessages = new ConcurrentDictionary<Type, IList<string>>();
     
