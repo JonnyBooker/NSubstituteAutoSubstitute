@@ -1,7 +1,6 @@
-﻿using NSubstitute.AutoSub.Tests.PartsOf.Collections.Interfaces;
-using NSubstitute.AutoSub.Tests.PartsOf.Simple;
+﻿using NSubstitute.AutoSub.Tests.PartsOf.Systems.Collections.Interfaces;
 
-namespace NSubstitute.AutoSub.Tests.PartsOf.Collections;
+namespace NSubstitute.AutoSub.Tests.PartsOf.Systems.Collections;
 
 public class ListPartsOfSystemUnderTest : ICollectionPartsOfSystemUnderTest
 {

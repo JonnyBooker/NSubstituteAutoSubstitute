@@ -1,5 +1,5 @@
 ﻿using AutoFixture;
-using NSubstitute.AutoSub.Tests.PartsOf.Simple;
+using NSubstitute.AutoSub.Tests.PartsOf.Systems;
 using Xunit;
 
 namespace NSubstitute.AutoSub.Tests.PartsOf;

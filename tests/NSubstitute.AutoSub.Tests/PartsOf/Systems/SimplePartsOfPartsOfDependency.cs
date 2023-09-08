@@ -1,4 +1,4 @@
-namespace NSubstitute.AutoSub.Tests.PartsOf.Simple;
+namespace NSubstitute.AutoSub.Tests.PartsOf.Systems;
 
 public class SimplePartsOfPartsOfDependency
 {

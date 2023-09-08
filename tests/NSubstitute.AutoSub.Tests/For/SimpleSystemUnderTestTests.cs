@@ -1,7 +1,7 @@
 using AutoFixture;
+using NSubstitute.AutoSub.Tests.For.Dependencies;
 using NSubstitute.AutoSub.Tests.For.Implementations;
-using NSubstitute.AutoSub.Tests.For.Interfaces;
-using NSubstitute.AutoSub.Tests.For.Simple;
+using NSubstitute.AutoSub.Tests.For.Systems;
 using Xunit;
 
 namespace NSubstitute.AutoSub.Tests.For;

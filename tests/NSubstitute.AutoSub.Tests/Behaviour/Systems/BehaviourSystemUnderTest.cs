@@ -1,13 +1,13 @@
-﻿using NSubstitute.AutoSub.Tests.For.Interfaces;
+﻿using NSubstitute.AutoSub.Tests.Behaviour.Dependencies;
 
-namespace NSubstitute.AutoSub.Tests.For.Simple;
+namespace NSubstitute.AutoSub.Tests.Behaviour.Systems;
 
-public class SimpleSystemUnderTest
+public class BehaviourSystemUnderTest
 {
-    private readonly IStringGenerationDependency _stringGenerationDependency;
-    private readonly IIntGenerationDependency _intGenerationDependency;
+    private readonly IBehaviourStringGenerationDependency _stringGenerationDependency;
+    private readonly IBehaviourIntGenerationDependency _intGenerationDependency;
 
-    public SimpleSystemUnderTest(IStringGenerationDependency stringGenerationDependency, IIntGenerationDependency intGenerationDependency)
+    public BehaviourSystemUnderTest(IBehaviourStringGenerationDependency stringGenerationDependency, IBehaviourIntGenerationDependency intGenerationDependency)
     {
         _stringGenerationDependency = stringGenerationDependency;
         _intGenerationDependency = intGenerationDependency;

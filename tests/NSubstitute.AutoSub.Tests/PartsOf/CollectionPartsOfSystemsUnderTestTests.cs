@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
-using NSubstitute.AutoSub.Tests.PartsOf.Collections;
-using NSubstitute.AutoSub.Tests.PartsOf.Collections.Interfaces;
-using NSubstitute.AutoSub.Tests.PartsOf.Simple;
+using NSubstitute.AutoSub.Tests.PartsOf.Systems;
+using NSubstitute.AutoSub.Tests.PartsOf.Systems.Collections;
+using NSubstitute.AutoSub.Tests.PartsOf.Systems.Collections.Interfaces;
 using Xunit;
 
 namespace NSubstitute.AutoSub.Tests.PartsOf;

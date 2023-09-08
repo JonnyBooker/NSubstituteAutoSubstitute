@@ -1,4 +1,4 @@
-﻿namespace NSubstitute.AutoSub.Tests.For.Interfaces;
+﻿namespace NSubstitute.AutoSub.Tests.For.Dependencies;
 
 public interface IStringGenerationDependency
 {

@@ -1,4 +1,4 @@
-﻿using NSubstitute.AutoSub.Tests.For.Interfaces;
+﻿using NSubstitute.AutoSub.Tests.For.Dependencies;
 
 namespace NSubstitute.AutoSub.Tests.For.Implementations;
 
