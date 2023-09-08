@@ -2,16 +2,29 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <OutputType>Library</OutputType>
         <Nullable>enable</Nullable>
         <RootNamespace>NSubstitute.AutoSub</RootNamespace>
         <LangVersion>latest</LangVersion>
+        <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Authors>Jonny Booker</Authors>
+        <PackageDescription>An auto-substitute/mock generating container that creates mocks using NSubstitute</PackageDescription>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageProjectUrl>https://github.com/jonnybooker/NSubstitute.AutoSubstitute</PackageProjectUrl>
+        
+        <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">0.1.0</VersionPrefix>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
       <PackageReference Include="NSubstitute" Version="5.0.0" />
     </ItemGroup>
 
-
-
+    <ItemGroup>
+        <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
 
 </Project>
