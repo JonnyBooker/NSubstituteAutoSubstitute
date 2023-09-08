@@ -101,7 +101,16 @@ public class AutoSubstitute : IServiceProvider
             return this;
         }
 
-        throw new Exception("");
+        switch (_behaviour)
+        {
+            case SubstituteBehaviour.LooseFull:
+            case SubstituteBehaviour.LooseParts:
+                throw new Exception("Could not find mocked service. This should not have happened but a workaround would be to utilise the 'Use'/'UseCollection' methods to ensure there is a implementation used.");
+            case SubstituteBehaviour.Strict:
+                throw new Exception($"Could not find mocked service. Substitute behaviour is 'Strict' so unless you have explicitly utilised the '{typeof(T).Name}' type or utilise 'Use'/'UseCollection', the dependency will be null and cannot be checked via this method.");
+            default:
+                throw new ArgumentOutOfRangeException(null, "Unable to verify received at this time.");
+        }
     }
 
     /// <summary>
@@ -145,7 +154,7 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <param name="instance">The instance to use during the creation of a system under test</param>
     /// <typeparam name="T">The type of the instance</typeparam>
-    public void UseSubstitute<T>(T instance) where T : class
+    public void Use<T>(T instance) where T : class
     {
         var instanceType = typeof(T);
         _ = _typeMap.TryRemove(instanceType, out _);
@@ -159,7 +168,7 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <param name="instances">Instances to be injected into a system under test</param>
     /// <typeparam name="T">The base/interface type of the instances being passed in</typeparam>
-    public void UseSubstituteCollection<T>(params T[] instances) where T : class
+    public void UseCollection<T>(params T[] instances) where T : class
     {
         var collectionType = typeof(IEnumerable<T>);
         _ = _typeMap.TryRemove(collectionType, out _);

@@ -38,7 +38,7 @@ public class CollectionPartsOfSystemsUnderTestTests
             .MockedMethod()
             .Returns(item2);
         
-        AutoSubstitute.UseSubstituteCollection(instance1, instance2);
+        AutoSubstitute.UseCollection(instance1, instance2);
 
         var sut = (ICollectionPartsOfSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
