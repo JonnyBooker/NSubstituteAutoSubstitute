@@ -1,7 +1,7 @@
-﻿using NSubstitute.AutoSub.Tests.For.Collections.Interfaces;
-using NSubstitute.AutoSub.Tests.For.Interfaces;
+﻿using NSubstitute.AutoSub.Tests.For.Dependencies;
+using NSubstitute.AutoSub.Tests.For.Systems.Collections.Interfaces;
 
-namespace NSubstitute.AutoSub.Tests.For.Collections;
+namespace NSubstitute.AutoSub.Tests.For.Systems.Collections;
 
 public class ReadOnlyCollectionSystemUnderTest : ICollectionSystemUnderTest
 {

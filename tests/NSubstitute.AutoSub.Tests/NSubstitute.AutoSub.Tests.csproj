@@ -34,6 +34,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Behaviour\" />
+      <Folder Include="For\Systems\Simple\" />
     </ItemGroup>
 </Project>
