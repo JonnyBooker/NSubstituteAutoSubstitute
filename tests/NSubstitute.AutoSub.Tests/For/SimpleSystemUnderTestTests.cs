@@ -104,7 +104,7 @@ public class SimpleSystemUnderTestTests
     public void SimpleSystemUnderTest_WhenGivenImplementation_WillReturnImplementationResult()
     {
         //Arrange
-        AutoSubstitute.UseSubstitute<IStringGenerationDependency>(new HelloStringGenerationDependency());
+        AutoSubstitute.Use<IStringGenerationDependency>(new HelloStringGenerationDependency());
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();

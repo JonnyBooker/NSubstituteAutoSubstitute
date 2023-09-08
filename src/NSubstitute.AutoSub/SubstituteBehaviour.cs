@@ -1,5 +1,8 @@
 ﻿namespace NSubstitute.AutoSub;
 
+/// <summary>
+/// Defines how substitutes are handled when created during instance creation
+/// </summary>
 public enum SubstituteBehaviour
 {
     /// <summary>

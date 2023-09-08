@@ -39,7 +39,7 @@ public class CollectionSystemsUnderTestTests
             .Generate()
             .Returns(item2);
         
-        AutoSubstitute.UseSubstituteCollection(instance1, instance2);
+        AutoSubstitute.UseCollection(instance1, instance2);
 
         var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
@@ -74,7 +74,7 @@ public class CollectionSystemsUnderTestTests
     public void CollectionSystemUnderTest_WhenGivenMultipleImplementations_WillReturnImplementationsResult(Type value)
     {
         //Arrange
-        AutoSubstitute.UseSubstituteCollection<IStringGenerationDependency>(new HelloStringGenerationDependency(),
+        AutoSubstitute.UseCollection<IStringGenerationDependency>(new HelloStringGenerationDependency(),
             new WorldStringGenerationDependency());
 
         //Act
