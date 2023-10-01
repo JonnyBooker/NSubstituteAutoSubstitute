@@ -6,20 +6,14 @@
 public enum SubstituteBehaviour
 {
     /// <summary>
-    /// Use <see cref="Substitute.For{T}"/> for creating any substitutes. All instances
-    /// created will have their dependencies created automatically
+    /// All instances created will have their dependencies created automatically. 
     /// </summary>
-    LooseFull = 0,
+    Automatic = 0,
     
     /// <summary>
-    /// Use <see cref="Substitute.ForPartsOf{T}"/> for creating any substitutes. All instances
-    /// created will have their dependencies created automatically
+    /// Will not automatically create any dependencies when searching for suitable constructors. This
+    /// means if a explicit dependency mock has not been created before a method that uses the dependency,
+    /// then it will throw an exception.
     /// </summary>
-    LooseParts = 1,
-    
-    /// <summary>
-    /// Will not automatically create any dependencies of a class and will return null unless
-    /// behaviours of a class are explicitly defined 
-    /// </summary>
-    Strict = 2
+    Manual = 1
 }

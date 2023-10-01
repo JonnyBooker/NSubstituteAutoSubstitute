@@ -9,13 +9,8 @@ public class SimplePartsOfSystemUnderTest
         _simplePartsOfPartsOfDependency = simplePartsOfPartsOfDependency;
     }
 
-    public string InvokeMocked()
+    public string Invoke()
     {
-        return _simplePartsOfPartsOfDependency.MockedMethod();
-    }
-
-    public string InvokeNotMocked()
-    {
-        return _simplePartsOfPartsOfDependency.NonMockedMethod();
+        return _simplePartsOfPartsOfDependency.PartsOfInvoke();
     }
 }

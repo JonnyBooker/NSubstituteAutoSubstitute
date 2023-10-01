@@ -13,13 +13,9 @@ public class SimplePartsOfSystemUnderTestTests
     [Fact]
     public void SimplePartsOfSystemUnderTest_WhenCallDependencyMethodThatIsNotMocked_ReturnsOriginalValue()
     {
-        //Arrange
-        AutoSubstitute
-            .SubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
-
-        //Act
+        //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<SimplePartsOfSystemUnderTest>();
-        var result = sut.InvokeNotMocked();
+        var result = sut.Invoke();
 
         //Assert
         Assert.Equal(result, SimplePartsOfPartsOfDependency.NonMockedText);
@@ -33,15 +29,15 @@ public class SimplePartsOfSystemUnderTestTests
         
         AutoSubstitute
             .SubstituteForPartsOf<SimplePartsOfPartsOfDependency>()
-            .MockedMethod()
+            .PartsOfInvoke()
             .Returns(value);
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimplePartsOfSystemUnderTest>();
-        var result = sut.InvokeMocked();
+        var result = sut.Invoke();
 
         //Assert
-        Assert.NotEqual(result, SimplePartsOfPartsOfDependency.MockedText);
+        Assert.NotEqual(result, SimplePartsOfPartsOfDependency.NonMockedText);
         Assert.Equal(result, value);
     }
 }
