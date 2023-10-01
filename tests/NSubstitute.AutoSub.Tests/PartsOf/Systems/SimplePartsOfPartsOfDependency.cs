@@ -3,15 +3,9 @@ namespace NSubstitute.AutoSub.Tests.PartsOf.Systems;
 public class SimplePartsOfPartsOfDependency
 {
     public const string NonMockedText = "NonMockedText";
-    public const string MockedText = "MockedText";
     
-    public string NonMockedMethod()
+    public virtual string PartsOfInvoke()
     {
         return NonMockedText;
-    }
-
-    public virtual string MockedMethod()
-    {
-        return MockedText;
     }
 }

@@ -28,17 +28,17 @@ public class CollectionPartsOfSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
-        var instance2 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
+        var mockInstance1 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
+        var mockInstance2 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
 
-        instance1
-            .MockedMethod()
+        mockInstance1
+            .PartsOfInvoke()
             .Returns(item1);
-        instance2
-            .MockedMethod()
+        mockInstance2
+            .PartsOfInvoke()
             .Returns(item2);
         
-        AutoSubstitute.UseCollection(instance1, instance2);
+        AutoSubstitute.UseCollection(mockInstance1, mockInstance2);
 
         var sut = (ICollectionPartsOfSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
@@ -52,19 +52,20 @@ public class CollectionPartsOfSystemsUnderTestTests
     public void CollectionSystemUnderTest_WhenUsingSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue(Type value)
     {
         //Arrange
-        var item = Fixture.Create<string>();
+        var expectedValue = Fixture.Create<string>();
 
-        var instance = AutoSubstitute.SubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
+        var mockInstance = AutoSubstitute.SubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
 
-        instance
-            .MockedMethod()
-            .Returns(item);
+        mockInstance
+            .PartsOfInvoke()
+            .Returns(expectedValue);
 
         //Act
         var sut = (ICollectionPartsOfSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
 
         //Assert
-        Assert.Equal($"{item}", result);
+        Assert.NotEqual(result, SimplePartsOfPartsOfDependency.NonMockedText);
+        Assert.Equal(expectedValue, result);
     }
 }

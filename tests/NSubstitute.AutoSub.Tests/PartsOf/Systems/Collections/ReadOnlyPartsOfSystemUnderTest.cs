@@ -13,6 +13,6 @@ public class ReadOnlyPartsOfSystemUnderTest : ICollectionPartsOfSystemUnderTest
     
     public string Generate()
     {
-        return string.Join(" ", _simplePartsOfPartsOfDependencies.Select(x => x.MockedMethod()));
+        return string.Join(" ", _simplePartsOfPartsOfDependencies.Select(x => x.PartsOfInvoke()));
     }
 }
