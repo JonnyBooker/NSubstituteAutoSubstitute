@@ -26,4 +26,19 @@ public class BehaviourSystemUnderTest
 
         return $"{stringValue} {intValue}";
     }
+
+    public string GetValue()
+    {
+        return _stringGenerationDependency.Value;
+    }
+
+    public string CombinePreAndPostStrings(string prefix, string postfix)
+    {
+        return _stringGenerationDependency.Combine(prefix, postfix);
+    }
+
+    public void Process()
+    {
+        _stringGenerationDependency.Process();
+    }
 }

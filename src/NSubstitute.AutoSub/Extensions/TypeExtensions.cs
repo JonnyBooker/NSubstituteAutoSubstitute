@@ -17,20 +17,20 @@ internal static class TypeExtensions
         var containsInterfaceCollection = type.GetInterfaces().Any(i => i == typeof(IEnumerable));
         return containsInterfaceCollection;
     }
-    
+
     internal static IList CreateListForType(this Type type)
     {
         var existingListType = typeof(Collection<>).MakeGenericType(type);
         return (IList)Activator.CreateInstance(existingListType);
     }
-    
+
     internal static Type? GetUnderlyingCollectionType(this Type type)
     {
         if (type.IsArray)
         {
             return type.GetElementType();
         }
-            
+
         return type.GetGenericArguments().Single();
     }
 }
