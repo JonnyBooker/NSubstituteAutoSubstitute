@@ -104,10 +104,10 @@ public class AutoSubstitute : IServiceProvider
         switch (_behaviour)
         {
             case SubstituteBehaviour.Automatic:
-                throw new Exception("Could not find mocked service. This should not have happened but a workaround would be to utilise the 'Use'/'UseCollection' methods to ensure there is a implementation used.");
-            //TODO: Deal with
+                throw new Exception("Could not find mocked service. This typically should not have happened but a workaround would be to utilise the 'Use'/'UseCollection' methods to ensure there is a implementation used.");
             case SubstituteBehaviour.ManualWithNulls:
-                throw new Exception($"Could not find mocked service. Substitute behaviour is 'Strict' so unless you have explicitly utilised the '{typeof(T).Name}' type or utilise 'Use'/'UseCollection', the dependency will be null and cannot be checked via this method.");
+            case SubstituteBehaviour.ManualWithExceptions:
+                throw new Exception($"Could not find mocked service. Substitute behaviour is 'Manual' so unless you have explicitly utilised the '{typeof(T).Name}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.");
             default:
                 throw new ArgumentOutOfRangeException(null, "Unable to verify received at this time.");
         }
@@ -211,8 +211,7 @@ public class AutoSubstitute : IServiceProvider
 
         ConstructorInfo? bestConstructor = null;
         var constructorArguments = Array.Empty<object?>();
-
-        var currentMockTypes = _typeMap.Keys;
+        
         foreach (var potentialConstructor in potentialConstructors)
         {
             var constructorParameterTypes = potentialConstructor!.GetParameters()
@@ -225,7 +224,7 @@ public class AutoSubstitute : IServiceProvider
             {
                 var allParametersContained = constructorParameterTypes
                     .Where(t => !t.IsCollection())
-                    .All(type => currentMockTypes.Contains(type));
+                    .All(type => _typeMap.Keys.Contains(type));
 
                 var collectionParameters = constructorParameterTypes
                     .Where(t => t.IsCollection())
@@ -233,7 +232,7 @@ public class AutoSubstitute : IServiceProvider
                 var allCollectionParametersContained = collectionParameters
                     .Select(t => t.GetUnderlyingCollectionType())
                     .Where(t => t is not null)
-                    .All(t => currentMockTypes.Contains(t!));
+                    .All(t => _typeMap.Keys.Contains(t!));
 
                 if (allParametersContained && collectionParameters.Any() && allCollectionParametersContained)
                 {
