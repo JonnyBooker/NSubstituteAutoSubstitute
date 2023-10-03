@@ -15,5 +15,7 @@ public enum SubstituteBehaviour
     /// means if a explicit dependency mock has not been created before a method that uses the dependency,
     /// then it will throw an exception.
     /// </summary>
-    Manual = 1
+    ManualWithNulls = 1,
+    
+    ManualWithExceptions = 3
 }

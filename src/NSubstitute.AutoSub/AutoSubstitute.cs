@@ -105,7 +105,8 @@ public class AutoSubstitute : IServiceProvider
         {
             case SubstituteBehaviour.Automatic:
                 throw new Exception("Could not find mocked service. This should not have happened but a workaround would be to utilise the 'Use'/'UseCollection' methods to ensure there is a implementation used.");
-            case SubstituteBehaviour.Manual:
+            //TODO: Deal with
+            case SubstituteBehaviour.ManualWithNulls:
                 throw new Exception($"Could not find mocked service. Substitute behaviour is 'Strict' so unless you have explicitly utilised the '{typeof(T).Name}' type or utilise 'Use'/'UseCollection', the dependency will be null and cannot be checked via this method.");
             default:
                 throw new ArgumentOutOfRangeException(null, "Unable to verify received at this time.");
@@ -180,7 +181,7 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <typeparam name="T">The type to create</typeparam>
     /// <returns>A instance to test according to the type passed in</returns>
-    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed</exception>
+    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed or anything goes wrong</exception>
     public T CreateInstance<T>() where T : class
     {
         return (T)CreateInstance(typeof(T));
@@ -194,7 +195,7 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <param name="instanceType">The type to create</param>
     /// <returns>A instance to test according to the instance type passed in, passed back as a generic object</returns>
-    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed</exception>
+    /// <exception cref="AutoSubstituteException">Thrown if the instance cannot be constructed or anything goes wrong</exception>
     public object CreateInstance(Type instanceType)
     {
         var bindingFlags = !_searchPrivateConstructors ? 
@@ -209,29 +210,29 @@ public class AutoSubstitute : IServiceProvider
         _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Found '{potentialConstructors.Count}' potential constructors");
 
         ConstructorInfo? bestConstructor = null;
-        object[]? constructorArguments = null;
+        var constructorArguments = Array.Empty<object?>();
 
         var currentMockTypes = _typeMap.Keys;
         foreach (var potentialConstructor in potentialConstructors)
         {
-            var constructorParameters = potentialConstructor!.GetParameters()
-                .Select(x => x.ParameterType)
+            var constructorParameterTypes = potentialConstructor!.GetParameters()
+                .Select(p => p.ParameterType)
                 .ToArray();
             
-            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Checking constructor using '{_behaviour.ToString()}' behaviour. Parameters: {string.Join(", ", constructorParameters.Select(x => x.Name))}");
+            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Checking constructor using '{_behaviour.ToString()}' behaviour. Parameters: {string.Join(", ", constructorParameterTypes.Select(x => x.Name))}");
 
-            if (_behaviour == SubstituteBehaviour.Manual)
+            if (_behaviour != SubstituteBehaviour.Automatic)
             {
-                var allParametersContained = constructorParameters
-                    .Where(x => !x.IsCollection())
+                var allParametersContained = constructorParameterTypes
+                    .Where(t => !t.IsCollection())
                     .All(type => currentMockTypes.Contains(type));
 
-                var collectionParameters = constructorParameters
-                    .Where(x => x.IsCollection())
+                var collectionParameters = constructorParameterTypes
+                    .Where(t => t.IsCollection())
                     .ToArray();
                 var allCollectionParametersContained = collectionParameters
-                    .Select(x => x.GetUnderlyingCollectionType())
-                    .Where(x => x is not null)
+                    .Select(t => t.GetUnderlyingCollectionType())
+                    .Where(t => t is not null)
                     .All(t => currentMockTypes.Contains(t!));
 
                 if (allParametersContained && collectionParameters.Any() && allCollectionParametersContained)
@@ -239,7 +240,7 @@ public class AutoSubstitute : IServiceProvider
                     _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "Found best constructor!");
                     
                     bestConstructor = potentialConstructor;
-                    constructorArguments = new object[constructorParameters.Length];
+                    constructorArguments = new object[constructorParameterTypes.Length];
                     break;
                 }
             }
@@ -255,25 +256,34 @@ public class AutoSubstitute : IServiceProvider
                 }
 
                 _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "Unsuitable constructor...");
-                
-                bestConstructor = null;
-                constructorArguments = null;
+            }
+        }
+        
+        //If are operating on a manual mode, then fallback
+        if (_behaviour != SubstituteBehaviour.Automatic)
+        {
+            bestConstructor = potentialConstructors.FirstOrDefault();
+            if (bestConstructor is not null && IsValidConstructor(instanceType, bestConstructor, out var mockedConstructorArguments))
+            {
+                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Falling back to largest constructor as using 'Manual' behaviour. Parameters: {bestConstructor.GetParameters().Select(t => t.Name)}");
+                constructorArguments = mockedConstructorArguments;
             }
         }
 
+        //We tried... Can't do no more...
         if (bestConstructor is null)
         {
             _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "No suitable constructor found for type");
-            var exceptionMessage = _behaviour == SubstituteBehaviour.Manual ? 
-                "Unable to find suitable constructor. You are using 'Manual' behaviour mode, a mock must be created for the method before the instance is created. Alternatively, use an 'Automatic' behaviour mode" : 
-                "Unable to find suitable constructor. Ensure there is a constructor that is accessible (i.e. public) and its constructor parameters are also accessible. Alternatively, you can use 'usePrivateConstructors' when 'AutoSubstitute' is created";
+            var exceptionMessage = _behaviour == SubstituteBehaviour.Automatic ? 
+                "Unable to find suitable constructor. Ensure there is a constructor that is accessible (i.e. public) and its constructor parameters are also accessible. Alternatively, you can use 'usePrivateConstructors' when 'AutoSubstitute' is created" :
+                "Unable to find suitable constructor. You are using 'Manual' behaviour mode, a mock must be created for the method before the instance is created. Alternatively, use an 'Automatic' behaviour mode";
             throw new AutoSubstituteException(exceptionMessage);
         }
 
-        return bestConstructor.Invoke(constructorArguments ?? Array.Empty<object>());
+        return bestConstructor.Invoke(constructorArguments);
     }
 
-    private bool IsValidConstructor(Type instanceTypeForConstructor, ConstructorInfo potentialConstructor, out object?[]? mockedConstructorArguments)
+    private bool IsValidConstructor(Type instanceTypeForConstructor, ConstructorInfo potentialConstructor, out object?[] mockedConstructorArguments)
     {
         var constructorParameters = potentialConstructor
             .GetParameters()
@@ -282,7 +292,7 @@ public class AutoSubstitute : IServiceProvider
 
         try
         {
-            object?[] constructorArguments = new object[constructorParameters.Length];
+            var constructorArguments = new object?[constructorParameters.Length];
             for (var constructorIndex = 0; constructorIndex < constructorParameters.Length; constructorIndex++)
             {
                 var constructorParameterType = constructorParameters[constructorIndex];
@@ -290,8 +300,7 @@ public class AutoSubstitute : IServiceProvider
                 _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Checking Mock for {constructorParameterType} type");
 
                 //Try and find according to the type given from the constructor first
-                var mockExists = TryGetService(constructorParameterType, out var mappedMock);
-                if (!mockExists)
+                if (!TryGetService(constructorParameterType, out var mappedMock))
                 {
                     //The type is a collection, check the underlying type of the collection
                     if (constructorParameterType.IsCollection())
@@ -299,10 +308,9 @@ public class AutoSubstitute : IServiceProvider
                         _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Mock was collection type, seeing if can find a mocked collection version of type");
                     
                         var underlyingCollectionType = constructorParameterType.GetUnderlyingCollectionType() ?? throw new AutoSubstituteException($"Unable to get underlying collection type for: {constructorParameterType.Name}");
-                        mockExists = TryGetService(underlyingCollectionType, out mappedMock);
 
                         //If a single mock is found, wrap it up in a collection and make it the mapped mock
-                        if (mockExists)
+                        if (TryGetService(underlyingCollectionType, out mappedMock))
                         {
                             _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Found single instance for collection mock type. Will use this!");
                         
@@ -312,14 +320,24 @@ public class AutoSubstitute : IServiceProvider
                         }
                         else
                         {
-                            //If the mock doesn't exist and we are using manual behaviour, create an empty collection
                             switch (_behaviour)
                             {
                                 case SubstituteBehaviour.Automatic:
-                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was loose so will create an empty collection of dependency type");
-                                
-                                    var emptyCollectionArgument = underlyingCollectionType.CreateListForType();
-                                    mappedMock = emptyCollectionArgument;
+                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Automatic' so will create an empty collection of dependency type");
+                                    mappedMock = underlyingCollectionType.CreateListForType();
+                                    break;
+                                case SubstituteBehaviour.ManualWithNulls:
+                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Nulls' so mock will be a null collection");
+                                    mappedMock = null;
+                                    break;
+                                case SubstituteBehaviour.ManualWithExceptions:
+                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Exceptions' so mock will a collection with an exception throwing substitute");
+                                    
+                                    var mockedCollectionList = underlyingCollectionType.CreateListForType();
+                                    var exceptionThrowingMock = CreateExceptionThrowingMockOrThrow(constructorParameterType);
+                                    
+                                    mockedCollectionList.Add(exceptionThrowingMock);
+                                    mappedMock = mockedCollectionList;
                                     break;
                             }
                         }
@@ -329,52 +347,43 @@ public class AutoSubstitute : IServiceProvider
                         switch (_behaviour)
                         {
                             case SubstituteBehaviour.Automatic:
-                            {
                                 _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Creating a substitute for type: {constructorParameterType}");
-                                
-                                mappedMock = CreateSubstitute(constructorParameterType, () =>
-                                {
-                                    switch (_behaviour)
-                                    {
-                                        case SubstituteBehaviour.Automatic:
-                                            return constructorParameterType.IsInterface ? 
-                                                Substitute.For(new[] { constructorParameterType }, Array.Empty<object>()) : 
-                                                typeof(Substitute)
-                                                    .GetMethod(nameof(Substitute.ForPartsOf))!
-                                                    .MakeGenericMethod(constructorParameterType)
-                                                    .Invoke(this, new object[] { Array.Empty<object>() });
-                                        default:
-                                            throw new ArgumentOutOfRangeException();
-                                    }
-                                });
+                                mappedMock = CreateSubstitute(constructorParameterType, () => constructorParameterType.CreateSubstitute());
                                 break;
-                            }
+                            case SubstituteBehaviour.ManualWithNulls:
+                                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Nulls' so mock will be a null");
+                                mappedMock = null;
+                                break;
+                            case SubstituteBehaviour.ManualWithExceptions:
+                                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Exceptions' so mock will be an exception throwing substitute");
+                                mappedMock = CreateExceptionThrowingMockOrThrow(constructorParameterType);
+                                break;
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(_behaviour), "Behaviour is not supported");
                         }
                     }
                 }
-
-                constructorArguments[constructorIndex] = mappedMock ?? throw new AutoSubstituteException($"Unable to created a mock for type. Type Attempted: {constructorParameterType.Name}");
+                
+                //Put whatever form came out into the constructor arguments
+                constructorArguments[constructorIndex] = mappedMock;
             }
 
-            //Made it out without issue, this constructor is suitable
+            //Constructor is suitable
             mockedConstructorArguments = constructorArguments;
             return true;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             //Something went wrong, not going to use this constructor
-            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Error happened checking eligibility of this constructor. Error: {e.Message}");
-            
-            mockedConstructorArguments = null;
+            _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Error happened checking eligibility of this constructor. Error: {ex.Message}");
+            mockedConstructorArguments = Array.Empty<object>();
             return false;
         }
     }
 
     private object CreateSubstitute(Type mockType, Func<object> actionCreateSubstitute, bool noCache = false)
     {
-        //If noCache flag is set, the type map is ignored and a entirely new instance is made and not stored to be use
+        //If flag is set, the type map is ignored and a entirely new instance is made and not stored to be use
         if (noCache)
         {
             _diagnosticsHandler.AddDiagnosticMessagesForType(mockType, "Creating a non cached substitute");
@@ -416,6 +425,18 @@ public class AutoSubstitute : IServiceProvider
 
         //Found a type in the map
         return true;
+    }
+
+    private object CreateExceptionThrowingMockOrThrow(Type constructorParameterType)
+    {
+        if (constructorParameterType.IsInterface)
+        {
+            return constructorParameterType.CreateExceptionThrowingSubstitute();
+        }
+
+        //TODO: Write errors
+        _diagnosticsHandler.AddDiagnosticMessagesForType(constructorParameterType, ""); 
+        throw new AutoSubstituteException("");
     }
 
     object? IServiceProvider.GetService(Type serviceType) => TryGetService(serviceType, out var mappedMockType) ? mappedMockType : null;
