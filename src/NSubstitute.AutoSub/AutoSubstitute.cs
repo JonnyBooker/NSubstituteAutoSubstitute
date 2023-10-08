@@ -258,7 +258,7 @@ public class AutoSubstitute : IServiceProvider
             }
         }
         
-        //If are operating on a manual mode, then fallback
+        //If are operating on a non automatic mode mode, then fallback to the "greediest"/largest constructor
         if (_behaviour != SubstituteBehaviour.Automatic)
         {
             bestConstructor = potentialConstructors.FirstOrDefault();
@@ -272,11 +272,29 @@ public class AutoSubstitute : IServiceProvider
         //We tried... Can't do no more...
         if (bestConstructor is null)
         {
+            string errorMessage;
+            switch (_behaviour)
+            {
+                case SubstituteBehaviour.ManualWithNulls:
+                    errorMessage = "Unable to find suitable constructor. " +
+                                   "You are using 'Manual with Nulls' behaviour mode, a mock must be created for the method before the system under test instance is created. " +
+                                   "Alternatively, use an 'Automatic' behaviour mode";
+                    break;
+                case SubstituteBehaviour.ManualWithExceptions:
+                    errorMessage = "Unable to find suitable constructor. " +
+                                   "You are using 'Manual with Exceptions' behaviour mode, the type you are create as a system under test may contain concrete implementations that are not suitable for this behaviour mode. " +
+                                   "'Use' can be used to ensure that these classes get the implementations that are expected to work with this behaviour mode. " +
+                                   "Alternatively, use an 'Automatic' behaviour mode";
+                    break;
+                default:
+                    errorMessage = "Unable to find suitable constructor. " +
+                                   "Ensure there is a constructor that is accessible (i.e. public) and its constructor parameters are also accessible. " +
+                                   "Alternatively, you can use 'usePrivateConstructors' when 'AutoSubstitute' is created";
+                    break;
+            }
+            
             _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, "No suitable constructor found for type");
-            var exceptionMessage = _behaviour == SubstituteBehaviour.Automatic ? 
-                "Unable to find suitable constructor. Ensure there is a constructor that is accessible (i.e. public) and its constructor parameters are also accessible. Alternatively, you can use 'usePrivateConstructors' when 'AutoSubstitute' is created" :
-                "Unable to find suitable constructor. You are using 'Manual' behaviour mode, a mock must be created for the method before the instance is created. Alternatively, use an 'Automatic' behaviour mode";
-            throw new AutoSubstituteException(exceptionMessage);
+            throw new AutoSubstituteException(errorMessage);
         }
 
         return bestConstructor.Invoke(constructorArguments);
@@ -330,7 +348,7 @@ public class AutoSubstitute : IServiceProvider
                                     mappedMock = null;
                                     break;
                                 case SubstituteBehaviour.ManualWithExceptions:
-                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Exceptions' so mock will a collection with an exception throwing substitute");
+                                    _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, "Behaviour was 'Manual with Exceptions' so mock will be a collection with an exception throwing substitute");
                                     
                                     var mockedCollectionList = underlyingCollectionType.CreateListForType();
                                     var exceptionThrowingMock = CreateExceptionThrowingMockOrThrow(constructorParameterType);
@@ -358,7 +376,7 @@ public class AutoSubstitute : IServiceProvider
                                 mappedMock = CreateExceptionThrowingMockOrThrow(constructorParameterType);
                                 break;
                             default:
-                                throw new ArgumentOutOfRangeException(nameof(_behaviour), "Behaviour is not supported");
+                                throw new ArgumentOutOfRangeException(nameof(_behaviour), "Behaviour is not supported. This is the fault of AutoSubstitute and should be fixed at a framework level.");
                         }
                     }
                 }
@@ -433,9 +451,8 @@ public class AutoSubstitute : IServiceProvider
             return constructorParameterType.CreateExceptionThrowingSubstitute();
         }
 
-        //TODO: Write errors
-        _diagnosticsHandler.AddDiagnosticMessagesForType(constructorParameterType, ""); 
-        throw new AutoSubstituteException("");
+        _diagnosticsHandler.AddDiagnosticMessagesForType(constructorParameterType, "When using behaviour 'Manual with Exceptions', only interfaces are usable with this behaviour"); 
+        throw new AutoSubstituteException("Only interfaces are usable when using 'Manual with Exceptions' behaviour");
     }
 
     object? IServiceProvider.GetService(Type serviceType) => TryGetService(serviceType, out var mappedMockType) ? mappedMockType : null;

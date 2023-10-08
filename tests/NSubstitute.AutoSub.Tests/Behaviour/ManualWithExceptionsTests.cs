@@ -59,7 +59,7 @@ public class ManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithSingleParameterAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'IBehaviourStringGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Mock has not been configured for 'IBehaviourTextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
@@ -78,7 +78,7 @@ public class ManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithMultipleParametersAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'IBehaviourStringGenerationDependency' when method 'Combine' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Mock has not been configured for 'IBehaviourTextGenerationDependency' when method 'Combine' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
@@ -97,7 +97,7 @@ public class ManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithNoReturnAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'IBehaviourStringGenerationDependency' when method 'Process' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Mock has not been configured for 'IBehaviourTextGenerationDependency' when method 'Process' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
@@ -116,7 +116,7 @@ public class ManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedAndOnlyOneDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'IBehaviourIntGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Mock has not been configured for 'IBehaviourNumberGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var expectedValue = Fixture.Create<string>();
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
@@ -141,7 +141,7 @@ public class ManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenPropertyCalledOnNonMockedDependency_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'IBehaviourStringGenerationDependency' when property 'Value' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Mock has not been configured for 'IBehaviourTextGenerationDependency' when property 'Value' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
