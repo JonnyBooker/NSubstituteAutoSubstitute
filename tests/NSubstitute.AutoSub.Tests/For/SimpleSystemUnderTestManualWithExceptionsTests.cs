@@ -8,6 +8,8 @@ namespace NSubstitute.AutoSub.Tests.For;
 
 public class SimpleSystemUnderTestManualWithExceptionsTests
 {
+    private AutoSubstitute AutoSubstitute { get; } = new(SubstituteBehaviour.ManualWithExceptions);
+    
     private Fixture Fixture { get; } = new();
     
     [Fact]
@@ -15,15 +17,14 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedValue = Fixture.Create<string>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
-        autoSubstitute
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
         var result = instance.GenerateText();
 
         //Assert
@@ -36,20 +37,19 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
         //Arrange
         var expectedTextValue = Fixture.Create<string>();
         var expectedIntValue = Fixture.Create<int>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
-
-        autoSubstitute
+        
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedTextValue);
 
-        autoSubstitute
+        AutoSubstitute
             .SubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(expectedIntValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
         var result = instance.CombineTextAndNumberGeneration();
 
         //Assert
@@ -61,10 +61,9 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
@@ -80,10 +79,9 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Combine' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
@@ -99,10 +97,9 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Process' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
@@ -119,15 +116,14 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
         //Arrange
         var expectedMessage = "Mock has not been configured for 'INumberGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
         var expectedValue = Fixture.Create<string>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
-
-        autoSubstitute
+        
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
@@ -143,10 +139,9 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when property 'Value' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>

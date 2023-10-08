@@ -7,6 +7,8 @@ namespace NSubstitute.AutoSub.Tests.For;
 
 public class SimpleSystemUnderTestManualWithNullsTests
 {
+    private AutoSubstitute AutoSubstitute { get; } = new(SubstituteBehaviour.ManualWithNulls);
+    
     private Fixture Fixture { get; } = new();
     
     [Fact]
@@ -14,15 +16,14 @@ public class SimpleSystemUnderTestManualWithNullsTests
     {
         //Arrange
         var expectedValue = Fixture.Create<string>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
-        autoSubstitute
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
         var result = instance.GenerateText();
 
         //Assert
@@ -35,20 +36,19 @@ public class SimpleSystemUnderTestManualWithNullsTests
         //Arrange
         var expectedTextValue = Fixture.Create<string>();
         var expectedNumberValue = Fixture.Create<int>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
-
-        autoSubstitute
+        
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedTextValue);
 
-        autoSubstitute
+        AutoSubstitute
             .SubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(expectedNumberValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
         var result = instance.CombineTextAndNumberGeneration();
 
         //Assert
@@ -58,11 +58,8 @@ public class SimpleSystemUnderTestManualWithNullsTests
     [Fact]
     public void SubstituteBehaviourManualWithNulls_WhenUsedAndNoDependencyMockedPriorToCreate_WillThrowNullReferenceException()
     {
-        //Arrange
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
-        
-        //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        //Arrange & Act
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>
@@ -76,15 +73,14 @@ public class SimpleSystemUnderTestManualWithNullsTests
     {
         //Arrange
         var expectedValue = Fixture.Create<string>();
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
-
-        autoSubstitute
+        
+        AutoSubstitute
             .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>
