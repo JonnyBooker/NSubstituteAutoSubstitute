@@ -4,21 +4,23 @@ using Xunit;
 
 namespace NSubstitute.AutoSub.Tests.PartsOf;
 
-public class SimplePartsOfSystemUnderTestTests
+public class SimplePartsOfSystemUnderTestManualWithNullsTests
 {
-    private AutoSubstitute AutoSubstitute { get; } = new();
-
+    private AutoSubstitute AutoSubstitute { get; } = new(SubstituteBehaviour.ManualWithNulls);
+    
     private Fixture Fixture { get; } = new();
 
     [Fact]
-    public void SimplePartsOfSystemUnderTest_WhenCallDependencyMethodThatIsNotMocked_ReturnsOriginalValue()
+    public void SimplePartsOfSystemUnderTest_WhenCallDependencyMethodThatIsNotMocked_ThrowsNullReferenceException()
     {
-        //Arrange & Act
+        //Arrange
         var sut = AutoSubstitute.CreateInstance<SimplePartsOfSystemUnderTest>();
-        var result = sut.Invoke();
-
-        //Assert
-        Assert.Equal(result, SimplePartsOfPartsOfDependency.NonMockedText);
+        
+        //Act & Assert
+        Assert.Throws<NullReferenceException>(() =>
+        {
+            sut.Invoke();
+        });
     }
     
     [Fact]

@@ -267,6 +267,10 @@ public class AutoSubstitute : IServiceProvider
                 _diagnosticsHandler.AddDiagnosticMessagesForType(instanceType, $"Falling back to largest constructor as using 'Manual' behaviour. Parameters: {bestConstructor.GetParameters().Select(t => t.Name)}");
                 constructorArguments = mockedConstructorArguments;
             }
+            else
+            {
+                bestConstructor = null;
+            }
         }
 
         //We tried... Can't do no more...
