@@ -19,7 +19,7 @@ public class PrivateConstructorTests
         //Act & Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
         {
-            autoSubstitute.CreateInstance<PrivateConstructorSystemUnderTest>();
+            _ = autoSubstitute.CreateInstance<PrivateConstructorSystemUnderTest>();
         });
         
         Assert.Equal(expectedException, exception.Message);
