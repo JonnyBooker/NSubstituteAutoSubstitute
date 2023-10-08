@@ -9,6 +9,8 @@ namespace NSubstitute.AutoSub.Tests.For;
 
 public class CollectionSystemsUnderTestManualWithExceptionsTests
 {
+    private AutoSubstitute AutoSubstitute { get; } = new(SubstituteBehaviour.ManualWithExceptions);
+    
     private Fixture Fixture { get; } = new();
     
     public static IEnumerable<object[]> CollectionData => new List<object[]>
@@ -26,11 +28,9 @@ public class CollectionSystemsUnderTestManualWithExceptionsTests
         //Arrange
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
-        
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
-        var instance1 = autoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
-        var instance2 = autoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance1 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
 
         instance1
             .Generate()
@@ -39,9 +39,9 @@ public class CollectionSystemsUnderTestManualWithExceptionsTests
             .Generate()
             .Returns(item2);
         
-        autoSubstitute.UseCollection(instance1, instance2);
+        AutoSubstitute.UseCollection(instance1, instance2);
 
-        var sut = (ICollectionSystemUnderTest) autoSubstitute.CreateInstance(value);
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
 
         //Assert
@@ -54,10 +54,9 @@ public class CollectionSystemsUnderTestManualWithExceptionsTests
     {
         //Arrange
         var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
-
+        
         //Act
-        var sut = (ICollectionSystemUnderTest) autoSubstitute.CreateInstance(value);
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
 
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>

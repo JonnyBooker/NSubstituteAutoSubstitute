@@ -8,6 +8,8 @@ namespace NSubstitute.AutoSub.Tests.For;
 
 public class CollectionSystemsUnderTestManualWithNullsTests
 {
+    private AutoSubstitute AutoSubstitute { get; } = new(SubstituteBehaviour.ManualWithNulls);
+    
     private Fixture Fixture { get; } = new();
     
     public static IEnumerable<object[]> CollectionData => new List<object[]>
@@ -26,10 +28,8 @@ public class CollectionSystemsUnderTestManualWithNullsTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
         
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
-
-        var instance1 = autoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
-        var instance2 = autoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance1 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
 
         instance1
             .Generate()
@@ -38,9 +38,9 @@ public class CollectionSystemsUnderTestManualWithNullsTests
             .Generate()
             .Returns(item2);
         
-        autoSubstitute.UseCollection(instance1, instance2);
+        AutoSubstitute.UseCollection(instance1, instance2);
 
-        var sut = (ICollectionSystemUnderTest) autoSubstitute.CreateInstance(value);
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
 
         //Assert
@@ -52,9 +52,7 @@ public class CollectionSystemsUnderTestManualWithNullsTests
     public void CollectionSystemUnderTestInstances_WhenUsedAndNoDependencyMockedPriorToCreate_WillThrowNullReferenceException(Type value)
     {
         //Arrange
-        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
-
-        var sut = (ICollectionSystemUnderTest) autoSubstitute.CreateInstance(value);
+        var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
 
         //Assert
         Assert.Throws<ArgumentNullException>(() =>
