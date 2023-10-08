@@ -1,6 +1,6 @@
 namespace NSubstitute.AutoSub.Tests.ServiceProvider.Dependencies;
 
-public interface IServiceProviderStringGenerationDependency
+public interface IServiceProviderTextGenerationDependency
 {
     public string Generate();
 }

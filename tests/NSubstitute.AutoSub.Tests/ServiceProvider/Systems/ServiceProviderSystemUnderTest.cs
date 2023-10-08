@@ -14,8 +14,8 @@ public class ServiceProviderSystemUnderTest
 
     public string? Generate()
     {
-        var stringGenerationDependency = _serviceProvider.GetService<IServiceProviderStringGenerationDependency>();
-        return stringGenerationDependency?.Generate();
+        var textGenerationDependency = _serviceProvider.GetService<IServiceProviderTextGenerationDependency>();
+        return textGenerationDependency?.Generate();
     }
 
     public void GenerateUsingNotRegisteredDependency()

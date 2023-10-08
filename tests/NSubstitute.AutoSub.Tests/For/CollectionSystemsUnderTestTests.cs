@@ -29,8 +29,8 @@ public class CollectionSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteForNoCache<IStringGenerationDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoCache<IStringGenerationDependency>();
+        var instance1 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
 
         instance1
             .Generate()
@@ -55,7 +55,7 @@ public class CollectionSystemsUnderTestTests
         //Arrange
         var item = Fixture.Create<string>();
 
-        var instance = AutoSubstitute.SubstituteFor<IStringGenerationDependency>();
+        var instance = AutoSubstitute.SubstituteFor<ITextGenerationDependency>();
 
         instance
             .Generate()
@@ -74,15 +74,15 @@ public class CollectionSystemsUnderTestTests
     public void CollectionSystemUnderTest_WhenGivenMultipleImplementations_WillReturnImplementationsResult(Type value)
     {
         //Arrange
-        AutoSubstitute.UseCollection<IStringGenerationDependency>(new HelloStringGenerationDependency(),
-            new WorldStringGenerationDependency());
+        AutoSubstitute.UseCollection<ITextGenerationDependency>(new HelloTextGenerationDependency(),
+            new WorldTextGenerationDependency());
 
         //Act
         var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);
         var result = sut.Generate();
 
         //Assert
-        Assert.Equal($"{HelloStringGenerationDependency.HelloText} {WorldStringGenerationDependency.WorldText}", result);
+        Assert.Equal($"{HelloTextGenerationDependency.HelloText} {WorldTextGenerationDependency.WorldText}", result);
     }
     
     [Theory]

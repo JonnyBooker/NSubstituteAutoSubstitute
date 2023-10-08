@@ -4,41 +4,41 @@ namespace NSubstitute.AutoSub.Tests.Behaviour.Systems;
 
 public class BehaviourSystemUnderTest
 {
-    private readonly IBehaviourStringGenerationDependency _stringGenerationDependency;
-    private readonly IBehaviourIntGenerationDependency _intGenerationDependency;
+    private readonly IBehaviourTextGenerationDependency _textGenerationDependency;
+    private readonly IBehaviourNumberGenerationDependency _numberGenerationDependency;
 
-    public BehaviourSystemUnderTest(IBehaviourStringGenerationDependency stringGenerationDependency, IBehaviourIntGenerationDependency intGenerationDependency)
+    public BehaviourSystemUnderTest(IBehaviourTextGenerationDependency textGenerationDependency, IBehaviourNumberGenerationDependency numberGenerationDependency)
     {
-        _stringGenerationDependency = stringGenerationDependency;
-        _intGenerationDependency = intGenerationDependency;
+        _textGenerationDependency = textGenerationDependency;
+        _numberGenerationDependency = numberGenerationDependency;
     }
 
-    public string StringGenerationResult()
+    public string Generate()
     {
-        var value = _stringGenerationDependency.Generate();
+        var value = _textGenerationDependency.Generate();
         return value;
     }
 
-    public string CombineStringAndIntGeneration()
+    public string CombineTextAndNumberGeneration()
     {
-        var stringValue = _stringGenerationDependency.Generate();
-        var intValue = _intGenerationDependency.Generate();
+        var stringValue = _textGenerationDependency.Generate();
+        var intValue = _numberGenerationDependency.Generate();
 
         return $"{stringValue} {intValue}";
     }
 
     public string GetValue()
     {
-        return _stringGenerationDependency.Value;
+        return _textGenerationDependency.Value;
     }
 
     public string CombinePreAndPostStrings(string prefix, string postfix)
     {
-        return _stringGenerationDependency.Combine(prefix, postfix);
+        return _textGenerationDependency.Combine(prefix, postfix);
     }
 
     public void Process()
     {
-        _stringGenerationDependency.Process();
+        _textGenerationDependency.Process();
     }
 }

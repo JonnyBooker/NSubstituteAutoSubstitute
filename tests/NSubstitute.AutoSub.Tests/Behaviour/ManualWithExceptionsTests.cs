@@ -18,13 +18,13 @@ public class ManualWithExceptionsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
         var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.StringGenerationResult();
+        var result = instance.Generate();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -38,18 +38,18 @@ public class ManualWithExceptionsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourIntGenerationDependency>()
+            .SubstituteFor<IBehaviourNumberGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
         var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.StringGenerationResult();
+        var result = instance.Generate();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -68,7 +68,7 @@ public class ManualWithExceptionsTests
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
         {
-            instance.StringGenerationResult();
+            instance.Generate();
         });
         
         Assert.Equal(expectedMessage, exception.Message);
@@ -121,7 +121,7 @@ public class ManualWithExceptionsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
@@ -131,7 +131,7 @@ public class ManualWithExceptionsTests
         //Assert
         var exception = Assert.Throws<AutoSubstituteException>(() =>
         {
-            instance.CombineStringAndIntGeneration();
+            instance.CombineTextAndNumberGeneration();
         });
         
         Assert.Equal(expectedMessage, exception.Message);

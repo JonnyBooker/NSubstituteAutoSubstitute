@@ -1,6 +1,6 @@
 ﻿namespace NSubstitute.AutoSub.Tests.Behaviour.Dependencies;
 
-public interface IBehaviourStringGenerationDependency
+public interface IBehaviourTextGenerationDependency
 {
     string Value { get; }
     

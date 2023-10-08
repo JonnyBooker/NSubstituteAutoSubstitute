@@ -2,7 +2,7 @@
 
 namespace NSubstitute.AutoSub.Tests.For.Implementations;
 
-public class WorldStringGenerationDependency : IStringGenerationDependency
+public class WorldTextGenerationDependency : ITextGenerationDependency
 {
     public const string WorldText = "World";
     

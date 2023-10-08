@@ -32,8 +32,4 @@
             <_Parameter1>NSubstitute.AutoSub.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="For\Systems\Simple\" />
-    </ItemGroup>
 </Project>
