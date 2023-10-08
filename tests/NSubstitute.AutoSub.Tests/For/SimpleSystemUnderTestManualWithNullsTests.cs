@@ -23,8 +23,8 @@ public class SimpleSystemUnderTestManualWithNullsTests
             .Returns(expectedValue);
         
         //Act
-        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = instance.GenerateText();
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.GenerateText();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -48,8 +48,8 @@ public class SimpleSystemUnderTestManualWithNullsTests
             .Returns(expectedNumberValue);
         
         //Act
-        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = instance.CombineTextAndNumberGeneration();
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.CombineTextAndNumberGeneration();
 
         //Assert
         Assert.Equal($"{expectedTextValue} {expectedNumberValue}", result);
@@ -59,12 +59,12 @@ public class SimpleSystemUnderTestManualWithNullsTests
     public void SubstituteBehaviourManualWithNulls_WhenUsedAndNoDependencyMockedPriorToCreate_WillThrowNullReferenceException()
     {
         //Arrange & Act
-        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>
         {
-            instance.GenerateText();
+            sut.GenerateText();
         });
     }
     
@@ -80,12 +80,12 @@ public class SimpleSystemUnderTestManualWithNullsTests
             .Returns(expectedValue);
         
         //Act
-        var instance = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>
         {
-            instance.CombineTextAndNumberGeneration();
+            sut.CombineTextAndNumberGeneration();
         });
     }
 }
