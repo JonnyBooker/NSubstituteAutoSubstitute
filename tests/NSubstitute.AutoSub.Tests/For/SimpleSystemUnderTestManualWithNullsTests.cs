@@ -1,11 +1,11 @@
 ﻿using AutoFixture;
-using NSubstitute.AutoSub.Tests.Behaviour.Dependencies;
-using NSubstitute.AutoSub.Tests.Behaviour.Systems;
+using NSubstitute.AutoSub.Tests.For.Dependencies;
+using NSubstitute.AutoSub.Tests.For.Systems;
 using Xunit;
 
-namespace NSubstitute.AutoSub.Tests.Behaviour;
+namespace NSubstitute.AutoSub.Tests.For;
 
-public class ManualWithNullsTests
+public class SimpleSystemUnderTestManualWithNullsTests
 {
     private Fixture Fixture { get; } = new();
     
@@ -17,13 +17,13 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourTextGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.Generate();
+        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = instance.GenerateText();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -33,25 +33,26 @@ public class ManualWithNullsTests
     public void SubstituteBehaviourManualWithNulls_WhenUsedAndAllDependenciesMockedPriorToCreate_HasExpectedResult()
     {
         //Arrange
-        var expectedValue = Fixture.Create<string>();
+        var expectedTextValue = Fixture.Create<string>();
+        var expectedNumberValue = Fixture.Create<int>();
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourTextGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
-            .Returns(expectedValue);
+            .Returns(expectedTextValue);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourNumberGenerationDependency>()
+            .SubstituteFor<INumberGenerationDependency>()
             .Generate()
-            .Returns(expectedValue);
+            .Returns(expectedNumberValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.Generate();
+        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = instance.CombineTextAndNumberGeneration();
 
         //Assert
-        Assert.Equal(expectedValue, result);
+        Assert.Equal($"{expectedTextValue} {expectedNumberValue}", result);
     }
     
     [Fact]
@@ -61,12 +62,12 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
+        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>
         {
-            instance.Generate();
+            instance.GenerateText();
         });
     }
     
@@ -78,12 +79,12 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourTextGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
-        var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
+        var instance = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
 
         //Assert
         Assert.Throws<NullReferenceException>(() =>

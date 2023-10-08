@@ -1,4 +1,5 @@
-﻿using NSubstitute.AutoSub.Tests.For.Dependencies;
+﻿using System.Text;
+using NSubstitute.AutoSub.Tests.For.Dependencies;
 using NSubstitute.AutoSub.Tests.For.Systems.Collections.Interfaces;
 
 namespace NSubstitute.AutoSub.Tests.For.Systems.Collections;

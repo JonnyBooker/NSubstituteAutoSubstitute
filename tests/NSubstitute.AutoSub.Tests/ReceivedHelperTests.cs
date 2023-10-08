@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using NSubstitute.AutoSub.Exceptions;
 using NSubstitute.ReceivedExtensions;
 using Xunit;
 
@@ -20,6 +21,42 @@ public class ReceivedHelperTests
         //Assert
         AutoSubstitute
             .ReceivedOnce<IReceivedHelperTestClassDependency>(x => x.Generate());
+    }
+    
+    [Fact]
+    public void ReceivedOnce_WhenCalledWithNoParametersAndManualWithNullsBehaviour_WillThrowAutoSubstituteException()
+    {
+        //Arrange
+        var expectedMessage = $"Could not find mocked service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
+
+        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
+        
+        //Act & Assert
+        var exception = Assert.Throws<AutoSubstituteException>(() =>
+        {
+            autoSubstitute
+                .ReceivedOnce<IReceivedHelperTestClassDependency>(x => x.Generate());
+        });
+        
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+    
+    [Fact]
+    public void ReceivedOnce_WhenCalledWithNoParametersAndManualWithExceptionsBehaviour_WillThrowAutoSubstituteException()
+    {
+        //Arrange
+        var expectedMessage = $"Could not find mocked service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
+
+        var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
+        
+        //Act & Assert
+        var exception = Assert.Throws<AutoSubstituteException>(() =>
+        {
+            autoSubstitute
+                .ReceivedOnce<IReceivedHelperTestClassDependency>(x => x.Generate());
+        });
+        
+        Assert.Equal(expectedMessage, exception.Message);
     }
     
     [Fact]
