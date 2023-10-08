@@ -5,15 +5,15 @@ namespace NSubstitute.AutoSub.Tests.For.Systems.Collections;
 
 public class ListCollectionSystemUnderTest : ICollectionSystemUnderTest
 {
-    private readonly IList<IStringGenerationDependency> _stringGenerationDependencies;
+    private readonly IList<ITextGenerationDependency> _textGenerationDependencies;
 
-    public ListCollectionSystemUnderTest(IList<IStringGenerationDependency> stringGenerationDependencies)
+    public ListCollectionSystemUnderTest(IList<ITextGenerationDependency> textGenerationDependencies)
     {
-        _stringGenerationDependencies = stringGenerationDependencies;
+        _textGenerationDependencies = textGenerationDependencies;
     }
 
     public string Generate()
     {
-        return string.Join(" ", _stringGenerationDependencies.Select(x => x.Generate()));
+        return string.Join(" ", _textGenerationDependencies.Select(x => x.Generate()));
     }
 }

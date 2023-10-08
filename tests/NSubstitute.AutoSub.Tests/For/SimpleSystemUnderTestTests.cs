@@ -19,13 +19,13 @@ public class SimpleSystemUnderTestTests
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<IStringGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = sut.StringGenerationResult();
+        var result = sut.GenerateText();
 
         //Assert
         Assert.Equal(stringValue, result);
@@ -39,18 +39,18 @@ public class SimpleSystemUnderTestTests
         var intValue = Fixture.Create<int>();
 
         AutoSubstitute
-            .SubstituteFor<IStringGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         AutoSubstitute
-            .SubstituteFor<IIntGenerationDependency>()
+            .SubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(intValue);
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = sut.CombineStringAndIntGeneration();
+        var result = sut.CombineTextAndNumberGeneration();
 
         //Assert
         Assert.Equal($"{stringValue} {intValue}", result);
@@ -64,12 +64,12 @@ public class SimpleSystemUnderTestTests
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<IStringGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         //Act
-        var result = sut.StringGenerationResult();
+        var result = sut.GenerateText();
 
         //Assert
         Assert.Equal(stringValue, result);
@@ -84,17 +84,17 @@ public class SimpleSystemUnderTestTests
         var intValue = Fixture.Create<int>();
 
         AutoSubstitute
-            .SubstituteFor<IStringGenerationDependency>()
+            .SubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         AutoSubstitute
-            .SubstituteFor<IIntGenerationDependency>()
+            .SubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(intValue);
 
         //Act
-        var result = sut.CombineStringAndIntGeneration();
+        var result = sut.CombineTextAndNumberGeneration();
 
         //Assert
         Assert.Equal($"{stringValue} {intValue}", result);
@@ -104,13 +104,13 @@ public class SimpleSystemUnderTestTests
     public void SimpleSystemUnderTest_WhenGivenImplementation_WillReturnImplementationResult()
     {
         //Arrange
-        AutoSubstitute.Use<IStringGenerationDependency>(new HelloStringGenerationDependency());
+        AutoSubstitute.Use<ITextGenerationDependency>(new HelloTextGenerationDependency());
 
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = sut.StringGenerationResult();
+        var result = sut.GenerateText();
 
         //Assert
-        Assert.Equal(HelloStringGenerationDependency.HelloText, result);
+        Assert.Equal(HelloTextGenerationDependency.HelloText, result);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace NSubstitute.AutoSub.Tests.For.Implementations;
 
-public class HelloStringGenerationDependency : IStringGenerationDependency
+public class HelloTextGenerationDependency : ITextGenerationDependency
 {
     public const string HelloText = "Hello";
     

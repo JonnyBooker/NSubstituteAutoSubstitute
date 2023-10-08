@@ -17,13 +17,13 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
         var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.StringGenerationResult();
+        var result = instance.Generate();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -37,18 +37,18 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourIntGenerationDependency>()
+            .SubstituteFor<IBehaviourNumberGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
         //Act
         var instance = autoSubstitute.CreateInstance<BehaviourSystemUnderTest>();
-        var result = instance.StringGenerationResult();
+        var result = instance.Generate();
 
         //Assert
         Assert.Equal(expectedValue, result);
@@ -66,7 +66,7 @@ public class ManualWithNullsTests
         //Assert
         Assert.Throws<NullReferenceException>(() =>
         {
-            instance.StringGenerationResult();
+            instance.Generate();
         });
     }
     
@@ -78,7 +78,7 @@ public class ManualWithNullsTests
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
         autoSubstitute
-            .SubstituteFor<IBehaviourStringGenerationDependency>()
+            .SubstituteFor<IBehaviourTextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
@@ -88,7 +88,7 @@ public class ManualWithNullsTests
         //Assert
         Assert.Throws<NullReferenceException>(() =>
         {
-            instance.CombineStringAndIntGeneration();
+            instance.CombineTextAndNumberGeneration();
         });
     }
 }

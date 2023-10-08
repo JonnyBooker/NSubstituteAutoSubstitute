@@ -4,26 +4,26 @@ namespace NSubstitute.AutoSub.Tests.For.Systems;
 
 public class SimpleSystemUnderTest
 {
-    private readonly IStringGenerationDependency _stringGenerationDependency;
-    private readonly IIntGenerationDependency _intGenerationDependency;
+    private readonly ITextGenerationDependency _textGenerationDependency;
+    private readonly INumberGenerationDependency _numberGenerationDependency;
 
-    public SimpleSystemUnderTest(IStringGenerationDependency stringGenerationDependency, IIntGenerationDependency intGenerationDependency)
+    public SimpleSystemUnderTest(ITextGenerationDependency textGenerationDependency, INumberGenerationDependency numberGenerationDependency)
     {
-        _stringGenerationDependency = stringGenerationDependency;
-        _intGenerationDependency = intGenerationDependency;
+        _textGenerationDependency = textGenerationDependency;
+        _numberGenerationDependency = numberGenerationDependency;
     }
 
-    public string StringGenerationResult()
+    public string GenerateText()
     {
-        var value = _stringGenerationDependency.Generate();
+        var value = _textGenerationDependency.Generate();
         return value;
     }
 
-    public string CombineStringAndIntGeneration()
+    public string CombineTextAndNumberGeneration()
     {
-        var stringValue = _stringGenerationDependency.Generate();
-        var intValue = _intGenerationDependency.Generate();
+        var textValue = _textGenerationDependency.Generate();
+        var numberValue = _numberGenerationDependency.Generate();
 
-        return $"{stringValue} {intValue}";
+        return $"{textValue} {numberValue}";
     }
 }

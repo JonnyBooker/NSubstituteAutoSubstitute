@@ -15,7 +15,7 @@ public class ReceivedHelperTests
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.StringGenerationResult();
+        _ = sut.Generate();
 
         //Assert
         AutoSubstitute
@@ -30,7 +30,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -46,8 +46,8 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter1);
-        _ = sut.CombineWithStringGenerationResult(parameter2);
+        _ = sut.CombineWithTextGenerationResult(parameter1);
+        _ = sut.CombineWithTextGenerationResult(parameter2);
 
         //Assert
         AutoSubstitute
@@ -60,7 +60,7 @@ public class ReceivedHelperTests
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.StringGenerationResult();
+        _ = sut.Generate();
 
         //Assert
         AutoSubstitute
@@ -75,7 +75,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -91,8 +91,8 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter1);
-        _ = sut.CombineWithStringGenerationResult(parameter2);
+        _ = sut.CombineWithTextGenerationResult(parameter1);
+        _ = sut.CombineWithTextGenerationResult(parameter2);
 
         //Assert
         AutoSubstitute
@@ -105,7 +105,7 @@ public class ReceivedHelperTests
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.StringGenerationResult();
+        _ = sut.Generate();
 
         //Assert
         AutoSubstitute
@@ -120,7 +120,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -136,8 +136,8 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter1);
-        _ = sut.CombineWithStringGenerationResult(parameter2);
+        _ = sut.CombineWithTextGenerationResult(parameter1);
+        _ = sut.CombineWithTextGenerationResult(parameter2);
 
         //Assert
         AutoSubstitute
@@ -150,7 +150,7 @@ public class ReceivedHelperTests
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.StringGenerationResult();
+        _ = sut.Generate();
 
         //Assert
         AutoSubstitute
@@ -165,7 +165,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -181,8 +181,8 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter1);
-        _ = sut.CombineWithStringGenerationResult(parameter2);
+        _ = sut.CombineWithTextGenerationResult(parameter1);
+        _ = sut.CombineWithTextGenerationResult(parameter2);
 
         //Assert
         AutoSubstitute
@@ -195,7 +195,7 @@ public class ReceivedHelperTests
     {
         //Arrange & Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.StringGenerationResult();
+        _ = sut.Generate();
 
         //Assert
         AutoSubstitute
@@ -210,7 +210,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -225,7 +225,7 @@ public class ReceivedHelperTests
         
         //Act
         var sut = AutoSubstitute.CreateInstance<ReceivedHelperTestClass>();
-        _ = sut.CombineWithStringGenerationResult(parameter);
+        _ = sut.CombineWithTextGenerationResult(parameter);
 
         //Assert
         AutoSubstitute
@@ -242,13 +242,13 @@ public class ReceivedHelperTests
             _receivedHelperTestClassDependency = receivedHelperTestClassDependency;
         }
 
-        public string StringGenerationResult()
+        public string Generate()
         {
             var value = _receivedHelperTestClassDependency.Generate();
             return value;
         }
 
-        public string CombineWithStringGenerationResult(string combined)
+        public string CombineWithTextGenerationResult(string combined)
         {
             var value = _receivedHelperTestClassDependency.CombinedWith(combined);
             return value;
