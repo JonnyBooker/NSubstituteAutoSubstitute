@@ -13,6 +13,11 @@ public class SimpleSystemUnderTest
         _numberGenerationDependency = numberGenerationDependency;
     }
 
+    public string GetValue()
+    {
+        return _textGenerationDependency.Value;
+    }
+
     public string GenerateText()
     {
         var value = _textGenerationDependency.Generate();
@@ -25,5 +30,15 @@ public class SimpleSystemUnderTest
         var numberValue = _numberGenerationDependency.Generate();
 
         return $"{textValue} {numberValue}";
+    }
+
+    public string CombinePreAndPostStrings(string prefix, string postfix)
+    {
+        return _textGenerationDependency.Combine(prefix, postfix);
+    }
+
+    public void Process()
+    {
+        _textGenerationDependency.Process();
     }
 }
