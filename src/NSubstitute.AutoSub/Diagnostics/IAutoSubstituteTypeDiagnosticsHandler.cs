@@ -10,6 +10,12 @@ namespace NSubstitute.AutoSub.Diagnostics;
 public interface IAutoSubstituteTypeDiagnosticsHandler
 {
     /// <summary>
+    /// Event that can be subscribed to when any diagnostic logs are made during the creation
+    /// of a substitute or system under test
+    /// </summary>
+    event EventHandler<AutoSubstituteDiagnosticLogEventArgs> DiagnosticLogAdded;
+        
+    /// <summary>
     /// Diagnostic messages broken down by Type with messages about the creation of substitutes/mocks for that type
     /// </summary>
     IReadOnlyDictionary<Type, ReadOnlyCollection<string>> DiagnosticMessages { get; }

@@ -9,7 +9,9 @@ namespace NSubstitute.AutoSub.Diagnostics;
 internal class AutoSubstituteTypeDiagnosticsHandler : IAutoSubstituteTypeDiagnosticsHandler
 {
     private readonly IDictionary<Type, IList<string>> _diagnosticMessages = new ConcurrentDictionary<Type, IList<string>>();
-    
+
+    public event EventHandler<AutoSubstituteDiagnosticLogEventArgs>? DiagnosticLogAdded;
+
     public IReadOnlyDictionary<Type, ReadOnlyCollection<string>> DiagnosticMessages
     {
         get
@@ -30,6 +32,7 @@ internal class AutoSubstituteTypeDiagnosticsHandler : IAutoSubstituteTypeDiagnos
         foreach (var message in messages)
         {
             diagnosticGroup.Add(message);
+            DiagnosticLogAdded?.Invoke(this, new AutoSubstituteDiagnosticLogEventArgs(type, message));
         }
     }
 }
