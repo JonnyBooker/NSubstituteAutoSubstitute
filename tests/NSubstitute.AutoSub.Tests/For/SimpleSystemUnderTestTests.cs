@@ -113,4 +113,42 @@ public class SimpleSystemUnderTestTests
         //Assert
         Assert.Equal(HelloTextGenerationDependency.HelloText, result);
     }
+
+    [Fact]
+    public void SimpleSystemUnderTest_WhenUsingNoCacheParameter_WillNotUseMockedVersion()
+    {
+        //Arrange
+        var stringValue = Fixture.Create<string>();
+
+        AutoSubstitute
+            .SubstituteFor<ITextGenerationDependency>(noCache: true)
+            .Generate()
+            .Returns(stringValue);
+
+        //Act
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.GenerateText();
+
+        //Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void SimpleSystemUnderTest_WhenUsingNoCacheSubstitute_WillNotUseMockedVersion()
+    {
+        //Arrange
+        var stringValue = Fixture.Create<string>();
+
+        AutoSubstitute
+            .SubstituteForNoCache<ITextGenerationDependency>()
+            .Generate()
+            .Returns(stringValue);
+
+        //Act
+        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+        var result = sut.GenerateText();
+
+        //Assert
+        Assert.Empty(result);
+    }
 }

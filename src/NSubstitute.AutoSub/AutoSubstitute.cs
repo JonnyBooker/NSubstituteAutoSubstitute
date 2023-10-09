@@ -318,7 +318,7 @@ public class AutoSubstitute : IServiceProvider
             {
                 var constructorParameterType = constructorParameters[constructorIndex];
                 
-                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Checking Mock for {constructorParameterType} type");
+                _diagnosticsHandler.AddDiagnosticMessagesForType(instanceTypeForConstructor, $"Checking Mock for '{constructorParameterType.Name}' type");
 
                 //Try and find according to the type given from the constructor first
                 if (!TryGetService(constructorParameterType, out var mappedMock))
