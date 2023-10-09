@@ -1,92 +1,182 @@
 # NSubstitute.AutoSubstitute
+This package is an automocking container for NSubsitute. The purpose of this project is to try and de-couple unit tests from the constructors of your systems under test.
 
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git.try-catch.io/Personal/nsubstitute.autosubstitute.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://git.try-catch.io/Personal/nsubstitute.autosubstitute/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Inspiration was taken from [AutoMocker](https://github.com/moq/Moq.AutoMocker) which offers similar functionality as this library but for Moq. It has been born out of using [NSubstitute](https://nsubstitute.github.io/) and wanting a similar workflow to be available.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Simplest Form
+Here is a simple example that will get you started on the right path:
+```csharp
+//Create an instance of AutoSubstitute to create systems to test from
+var autoSubstitute = new AutoSubstitute();
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+//Get a mock from AutoSubstitute (you can get this after an instance is created)
+var dependencyService = autoSubstitute.SubstituteFor<ITextGenerationDependency>();
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+//From here you can use NSubstitute as usual
+dependencyService
+    .GenerateText()
+    .Returns("Test Text");
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+//Create a instance of the system that you wish to test
+var sut = autoSubstitute.CreateInstance<ContentGenereationService>();
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+//Call the method using the dependency
+var result = sut.CreateContent();
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+//Verify with your favourite framework!
+Assert.Equal("Test Text", result);
+```
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Collections
+You might come across a scenario where a collection is the dependency that is being used. In which case, you have several options:
+```csharp
+//Create the AutoSubsitute instance
+var autoSubstitute = new AutoSubstitute();
 
-## License
-For open source projects, say how it is licensed.
+//-- Option #1: If you only want to test one instance
+//When a instance is created, the single instance will be wrapped in a collection and injected as a dependency
+var multipleDependency = autoSubstitute.SubstituteFor<IMultipleDependency>();
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+//Mock as you wish
+multipleDependency
+    .GenerateText()
+    .Returns("Test Text");
+
+//-- Option #2: If you have multiple dependencies
+//You can create a substitute that will not be cached by AutoSubstitute and just create a plain old mock
+var multipleDependency1 = autoSubstitute.SubstituteFor<IMultipleDependency>(noCache: true);
+var multipleDependency2 = autoSubstitute.SubstituteFor<IMultipleDependency>(noCache: true);
+
+//Mock as you wish
+multipleDependency1
+    .GenerateText()
+    .Returns("Test");
+
+multipleDependency1
+    .GenerateText()
+    .Returns("Text");
+
+//Tell AutoSubstitute to use both these dependencies whenever a collection is found as construction parameter
+autoSubstitute.UseCollection(instance1, instance2);
+
+//Carry on as normal...
+var sut = autoSubstitute.CreateInstance<SimpleSystemUnderTest>();
+var result = sut.CombineMultipleDependencyResults();
+
+//Assert!
+Assert.Equal("Test Text", result);
+```
+
+Classes used in above example:
+```csharp
+//System Under Test
+public class SimpleSystemUnderTest
+{
+    private readonly IEnumerable<IMultipleDependency> _multipleDependencies;
+
+    public SimpleSystemUnderTest(IEnumerable<IMultipleDependency> multipleDependencies)
+    {
+        _multipleDependencies = multipleDependencies;
+    }
+
+    public string CombineMultipleDependencyResults()
+    {
+        return string.Join(" ", _multipleDependencies.Select(d => d.GenerateText()));
+    }
+}
+
+//Dependency Example
+public interface IMultipleDependency
+{
+    string GenerateText();
+}
+```
+
+### Behaviours
+Built into AutoSubstitute is 3 different behaviour types you can use. These behaviours do have some common traits:
+- Mocks that are requested via `SubstituteFor` or `SubstitutePartsFor` will automatically be cached so that they can be used when a system under test is constructed via `CreateInstance`
+- All constructors will be analysed and checked in order of the constructors with the most parameters
+- Constructor parameters will be assessed if they are accessible and if mocks can be made for them. If at any point a parameter is deemed unsuitable, for example lack of access, the next constructor is checked
+
+The specifics of each behaviour are as follows:
+- **Automatic (Default)**
+  - This is the `default` behaviour of this framework. 
+  - Any dependency that is not cached will be automatically generated and then cached afterwards in case extra mock behahviour might want to be configured after calling `CreateInstance`
+- **Manual with Nulls**
+  - Is enabled via passing in a parameter via the constructor for `AutoSubstitute`:
+    ```csharp
+    var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
+    ```
+  - Any dependency that is not cached will not be generated and `null` will be passed through for any dependency that hasn't been requested prior to calling `CreateInstance`
+- **Manual with Exceptions**
+  - Is enabled via passing in a parameter via the constructor for `AutoSubstitute`:
+    ```csharp
+    var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
+    ```
+  - Any dependency that is not cached will be generated as a "exception throwing mock". What this means is, a mock instance will be created but every property/method will throw an exception when called. However it will give a informative message as to what exactly hasn't been mocked to the user, e.g.
+    > Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.
+  - This will only work with **interface** dependencies
+
+### Received Helpers
+Helpers has been provided to be able to do verifications on dependencies being invoked. This is just syntactic sugar to try simplify the process of verification.
+
+For example using the classes from the basic usage:
+```csharp
+//Create the AutoSubsitute instance
+var autoSubstitute = new AutoSubstitute();
+
+//Create an instance and invoke a method
+var sut = autoSubstitute.CreateInstance<ContentGenereationService>();
+_ = sut.CreateContent();
+
+//-- Option #1: Received Once
+AutoSubstitute
+    .ReceivedOnce<ITextGenerationDependency>(x => x.GenerateText());
+
+//-- Option #2: At least once
+AutoSubstitute
+    .ReceivedAtLeastOnce<ITextGenerationDependency>(x => x.GenerateText());
+
+//-- Option #3: Specified amount of times
+AutoSubstitute
+    .ReceivedTimes<ITextGenerationDependency>(x => x.GenerateText(), 1);
+
+//-- Option #4: Never received
+AutoSubstitute
+    .DidNotReceive<ITextGenerationDependency>(x => x.GenerateText());
+```
+
+### Extra Options/Features
+- Private Constructors
+  - If you need to be able to access `private` constructors, an extra parameter can be passed into the constructor of `AutoSubstitute` via a flag: `usePrivateConstructors`
+    ```csharp
+    var autoSubstitute = new AutoSubstitute(usePrivateConstructors: true);
+    ```
+- No Cache
+  - You can create subsitute instances without having `AutoSubstitute` track them. To do this, pass in the `noCache` flag when creating a substitute/mock or use `SubstituteForNoCache`
+    ```csharp
+    //Create the AutoSubsitute instance
+    var autoSubstitute = new AutoSubstitute(usePrivateConstructors: true);
+
+    //-- Option #1: Via method
+    autoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+
+    //-- Option #2: Via parameter
+    autoSubstitute.SubstituteFor<ITextGenerationDependency>(noCache: true);
+    ```
+- Service Provider
+  - `AutoSubstitute` implements `IServiceProvider` interface so it can be used as as a dependency injection container
+- Diagnostics
+  - All behaviours/checks/validations are logged to the `DiagnosticsHandler` instance on each `AutoSubstitute` instance. This will log things like:
+    - Reasons why constructors aren't selected
+    - When mocks/substitutes are created
+    - More detailed errors
+  - Events can also be subscribed to if you should so wish:
+    ```csharp
+    //Example Diagnostic Log Created
+    autoSubstitute.DiagnosticsHandler.DiagnosticLogAdded += (_, args) =>
+    {
+        messages.Add((args.Type, args.Message));
+    };
+    ```
