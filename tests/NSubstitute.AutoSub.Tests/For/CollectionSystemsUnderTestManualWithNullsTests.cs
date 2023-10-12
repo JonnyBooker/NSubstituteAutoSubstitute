@@ -28,8 +28,8 @@ public class CollectionSystemsUnderTestManualWithNullsTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
         
-        var instance1 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance1 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
 
         instance1
             .Generate()

@@ -28,8 +28,8 @@ public class CollectionPartsOfSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var mockInstance1 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
-        var mockInstance2 = AutoSubstitute.SubstituteForPartsOfNoCache<SimplePartsOfPartsOfDependency>();
+        var mockInstance1 = AutoSubstitute.SubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
+        var mockInstance2 = AutoSubstitute.SubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
 
         mockInstance1
             .PartsOfInvoke()

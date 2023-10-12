@@ -115,13 +115,13 @@ public class SimpleSystemUnderTestTests
     }
 
     [Fact]
-    public void SimpleSystemUnderTest_WhenUsingNoCacheParameter_WillNotUseMockedVersion()
+    public void SimpleSystemUnderTest_WhenUsingNoTrackingParameter_WillNotUseMockedVersion()
     {
         //Arrange
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>(noCache: true)
+            .SubstituteFor<ITextGenerationDependency>(noTracking: true)
             .Generate()
             .Returns(stringValue);
 
@@ -134,13 +134,13 @@ public class SimpleSystemUnderTestTests
     }
 
     [Fact]
-    public void SimpleSystemUnderTest_WhenUsingNoCacheSubstitute_WillNotUseMockedVersion()
+    public void SimpleSystemUnderTest_WhenUsingNoTrackingSubstitute_WillNotUseMockedVersion()
     {
         //Arrange
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteForNoCache<ITextGenerationDependency>()
+            .SubstituteForNoTracking<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
