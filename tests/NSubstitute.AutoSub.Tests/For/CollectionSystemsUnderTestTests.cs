@@ -30,7 +30,7 @@ public class CollectionSystemsUnderTestTests
         var item2 = Fixture.Create<string>();
 
         var instance1 = AutoSubstitute.SubstituteFor<ITextGenerationDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoCache<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
 
         instance1
             .Generate()

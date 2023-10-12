@@ -120,7 +120,7 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForNoCache<T>() where T : class => SubstituteFor<T>(true);
+    public T SubstituteForNoTracking<T>() where T : class => SubstituteFor<T>(true);
 
     /// <summary>
     /// Searches or creates a substitute that a system under test can use that is not
@@ -129,25 +129,25 @@ public class AutoSubstitute : IServiceProvider
     /// </summary>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForPartsOfNoCache<T>() where T : class => SubstituteForPartsOf<T>(true);
+    public T SubstituteForPartsOfNoTracking<T>() where T : class => SubstituteForPartsOf<T>(true);
 
     /// <summary>
     /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.For{T}"/>.
     /// </summary>
-    /// <param name="noCache">Option if want to create an instance that is newly created and not stored</param>
+    /// <param name="noTracking">Option if want to create an instance that is newly created and not be tracked and used by AutoSubstitute in further interactions</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteFor<T>(bool noCache = false) where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), noCache);
+    public T SubstituteFor<T>(bool noTracking = false) where T : class =>
+        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), noTracking);
 
     /// <summary>
     /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
     /// </summary>
-    /// <param name="noCache">Option if want to create an instance that is newly created and not stored</param>
+    /// <param name="noTracking">Option if want to create an instance that is newly created and not be tracked and used by AutoSubstitute in further interactions</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForPartsOf<T>(bool noCache = false) where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), noCache);
+    public T SubstituteForPartsOf<T>(bool noTracking = false) where T : class =>
+        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), noTracking);
 
     /// <summary>
     /// Forces a specific type instance to be used over creating a substituted instance automatically
