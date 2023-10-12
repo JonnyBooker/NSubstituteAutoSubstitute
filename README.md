@@ -1,16 +1,16 @@
 # NSubstitute.AutoSubstitute
-This package is an automocking container for NSubsitute. The purpose of this project is to try and de-couple unit tests from the constructors of your systems under test.
+This package is an automocking container for NSubsitute. The purpose of this project is to try and de-couple unit tests from the constructors of your systems under test making them less brittle as changes are made throughout your codebase but still enabling tests to pass/fail as expected.
 
-Inspiration was taken from [AutoMocker](https://github.com/moq/Moq.AutoMocker) which offers similar functionality as this library but for Moq. It has been born out of using [NSubstitute](https://nsubstitute.github.io/) and wanting a similar workflow to be available.
+Inspiration was taken from [AutoMocker](https://github.com/moq/Moq.AutoMocker) library which offers similar functionality as this library, but for Moq. It has been born out of using [NSubstitute](https://nsubstitute.github.io/) and wanting a similar workflow to be available.
 
 ## Usage
 ### Simplest Form
-Here is a simple example that will get you started on the right path:
+Here is a simple example to get you started on the right path:
 ```csharp
 //Create an instance of AutoSubstitute to create systems to test from
 var autoSubstitute = new AutoSubstitute();
 
-//Get a mock from AutoSubstitute (you can get this after an instance is created)
+//Get a mock from AutoSubstitute (you can get this before or after an instance is created)
 var dependencyService = autoSubstitute.SubstituteFor<ITextGenerationDependency>();
 
 //From here you can use NSubstitute as usual
@@ -19,9 +19,9 @@ dependencyService
     .Returns("Test Text");
 
 //Create a instance of the system that you wish to test
-var sut = autoSubstitute.CreateInstance<ContentGenereationService>();
+var sut = autoSubstitute.CreateInstance<ContentGenerationService>();
 
-//Call the method using the dependency
+//Call the method using the dependency you have mocked
 var result = sut.CreateContent();
 
 //Verify with your favourite framework!
@@ -29,7 +29,7 @@ Assert.Equal("Test Text", result);
 ```
 
 ### Collections
-You might come across a scenario where a collection is the dependency that is being used. In which case, you have several options:
+You might come across a scenario where a collection is being used as a dependency. In which case, you have several options to potentially use:
 ```csharp
 //Create the AutoSubsitute instance
 var autoSubstitute = new AutoSubstitute();
@@ -44,9 +44,9 @@ multipleDependency
     .Returns("Test Text");
 
 //-- Option #2: If you have multiple dependencies
-//You can create a substitute that will not be cached by AutoSubstitute and just create a plain old mock
+//You can create a substitute that will not be cached by AutoSubstitute and just create a plain old substitute/mock
 var multipleDependency1 = autoSubstitute.SubstituteFor<IMultipleDependency>(noCache: true);
-var multipleDependency2 = autoSubstitute.SubstituteFor<IMultipleDependency>(noCache: true);
+var multipleDependency2 = autoSubstitute.SubstituteForNoCache<IMultipleDependency>();
 
 //Mock as you wish
 multipleDependency1
@@ -57,7 +57,7 @@ multipleDependency1
     .GenerateText()
     .Returns("Text");
 
-//Tell AutoSubstitute to use both these dependencies whenever a collection is found as construction parameter
+//Tell AutoSubstitute to use both these dependencies whenever a collection is found as construction parameter. Multiple collection types are supported.
 autoSubstitute.UseCollection(instance1, instance2);
 
 //Carry on as normal...
@@ -103,6 +103,7 @@ The specifics of each behaviour are as follows:
 - **Automatic (Default)**
   - This is the `default` behaviour of this framework. 
   - Any dependency that is not cached will be automatically generated and then cached afterwards in case extra mock behahviour might want to be configured after calling `CreateInstance`
+  - Dependencies that are interfaces will use `Substitute.For` and classes will use `Substitute.ForPartsOf`
 - **Manual with Nulls**
   - Is enabled via passing in a parameter via the constructor for `AutoSubstitute`:
     ```csharp
@@ -116,12 +117,12 @@ The specifics of each behaviour are as follows:
     ```
   - Any dependency that is not cached will be generated as a "exception throwing mock". What this means is, a mock instance will be created but every property/method will throw an exception when called. However it will give a informative message as to what exactly hasn't been mocked to the user, e.g.
     > Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.
-  - This will only work with **interface** dependencies
+  - This will only work with **interface** dependencies. This is because in the case of a class, it is difficult to assume what should and shouldn't be mocked to throw a exception.
 
 ### Received Helpers
 Helpers has been provided to be able to do verifications on dependencies being invoked. This is just syntactic sugar to try simplify the process of verification.
 
-For example using the classes from the basic usage:
+For example using the classes from the basic usage above:
 ```csharp
 //Create the AutoSubsitute instance
 var autoSubstitute = new AutoSubstitute();
@@ -147,7 +148,7 @@ AutoSubstitute
     .DidNotReceive<ITextGenerationDependency>(x => x.GenerateText());
 ```
 
-### Extra Options/Features
+## Extra Options/Features
 - Private Constructors
   - If you need to be able to access `private` constructors, an extra parameter can be passed into the constructor of `AutoSubstitute` via a flag: `usePrivateConstructors`
     ```csharp
@@ -180,3 +181,11 @@ AutoSubstitute
         messages.Add((args.Type, args.Message));
     };
     ```
+
+## Building
+AutoSubstitute and its tests have been developed using Rider however should be compabile with Visual Studio. The solution can be found in the root of this repository.
+
+## Acknowledgements
+- [NSubstitute](https://nsubstitute.github.io/): A friendly substitute for .NET mocking libraries. This framework is built around this framework as a base for testing and wouldn't exist if not for it.
+- [AutoMocker](https://github.com/moq/Moq.AutoMocker): Inspiration for this project. Great framework to be able to achieve decoupling from your constructor parameters in your tests and making them less brittle.
+- [XUnit](https://github.com/xunit/xunit): Used to be able to test everything works as expected.
