@@ -7,16 +7,6 @@ namespace NSubstitute.AutoSub.Extensions;
 
 internal static class SubstituteExtensions
 {
-    internal static object CreateSubstitute(this Type type)
-    {
-        return type.IsInterface ? 
-            Substitute.For(new[] { type }, Array.Empty<object>()) : 
-            typeof(Substitute)
-                .GetMethod(nameof(Substitute.ForPartsOf))!
-                .MakeGenericMethod(type)
-                .Invoke(type, new object[] { Array.Empty<object>() });
-    }
-    
     internal static object CreateExceptionThrowingSubstitute(this Type type)
     {
         var exceptionThrowingMock = Substitute.For(new[] { type }, Array.Empty<object>());
