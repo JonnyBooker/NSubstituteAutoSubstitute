@@ -28,6 +28,18 @@ var result = sut.CreateContent();
 Assert.Equal("Test Text", result);
 ```
 
+### Methods For Mocking
+You can create substitutes using `For` and `ForPartsOf` in AutoSubstitute. Please follow the [warning from NSubstitutes](https://nsubstitute.github.io/help/creating-a-substitute/#substituting-infrequently-and-carefully-for-classes) when using PartsOf.  
+```csharp
+//NSubstitute 'For'
+var dependency = Substitute.For<IDependency>();
+var dependency = AutoSubstitute.SubstituteFor<IDependency>();
+
+//NSubstitute 'ForPartsOf'
+var dependency = Substitute.ForPartsOf<IDependency>();
+var dependency = AutoSubstitute.SubstituteForPartsOf<IDependency>();
+```
+
 ### Tracking Dependencies
 Unless the behaviour of `AutoSubstitute` is changed (see [behaviours](#behaviours)), the first time that a dependency is required/interacted with, it is created and subsequently tracked by `AutoSubstitute`. This means that anytime in future when you ask `AutoSubstitute` for a dependency, it will return the same instance everytime. 
 
@@ -37,7 +49,7 @@ This instance is created when:
 
 This ensures that when it comes time to `CreateInstance` being invoked, the dependencies that you have mocked/stubbed are the same ones that are injected into the constructors of any systems you are testing.
 
-You can create subsitute instances without having `AutoSubstitute` track them. To do this, pass in a `noTracking` parameter when creating a substitute/mock or use `SubstituteForNoTracking`
+You can create substitute instances without having `AutoSubstitute` track them. To do this, pass in a `noTracking` parameter when creating a substitute/mock or use `SubstituteForNoTracking`
 ```csharp
 //Create the AutoSubsitute instance
 var autoSubstitute = new AutoSubstitute();
@@ -48,6 +60,8 @@ autoSubstitute.SubstituteFor<ITextGenerationDependency>(noTracking: true);
 //-- Option #2: Via method
 autoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
 ```
+
+**Important Note:** Please note that should you change between using `SubstituteFor`/ `SubstituteForPartsOf`/ `Use`/ `UseCollection`, a exception will be thrown. This has been done to ensure the substitute created remains the same throughout its lifetime.  
 
 ### Mocking Collections
 You might come across a scenario where a collection is being used as a dependency. In which case, you have several options to potentially use:
@@ -125,7 +139,7 @@ The specifics of each behaviour are as follows:
 - **Automatic (Default)**
   - This is the `default` behaviour of this framework. 
   - Any mock/substitute that is used, whether requested via `SubstituteFor`/`SubstitutePartsFor` or if it created as part of a constructor when `CreateInstance` is called will only be created once.
-  - Dependencies that are interfaces will use `Substitute.For` and classes will use `Substitute.ForPartsOf`
+  - Automatically created dependencies will always use `Substitute.For` 
 - **Manual with Nulls**
   - Enabled via passing in `SubstituteBehaviour.ManualWithNulls` via the constructor for `AutoSubstitute`:
 

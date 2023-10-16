@@ -60,7 +60,7 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithSingleParameterAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
@@ -78,7 +78,7 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithMultipleParametersAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Combine' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'ITextGenerationDependency' when method 'Combine' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
@@ -96,7 +96,7 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedOnMethodWithNoReturnAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Process' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'ITextGenerationDependency' when method 'Process' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
@@ -114,7 +114,7 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenUsedAndOnlyOneDependencyMockedPriorToCreate_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'INumberGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'INumberGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         var expectedValue = Fixture.Create<string>();
         
         AutoSubstitute
@@ -138,7 +138,7 @@ public class SimpleSystemUnderTestManualWithExceptionsTests
     public void SubstituteBehaviourManualWithExceptions_WhenPropertyCalledOnNonMockedDependency_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when property 'Value' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'ITextGenerationDependency' when property 'Value' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         
         //Act
         var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();

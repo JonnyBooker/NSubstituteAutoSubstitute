@@ -20,7 +20,7 @@ public enum SubstituteBehaviour
     /// <summary>
     /// When creating instances using this behaviour, when a explicit dependency has not been used or
     /// created before a that is called that uses the dependency, that a explicit exception will be thrown which
-    /// will give a "nice" error saying a dependency hasn't been mocked before its use in a test.
+    /// will give a "nice" error saying a dependency hasn't been substituted before its use in a test.
     /// </summary>
     ManualWithExceptions = 3
 }
