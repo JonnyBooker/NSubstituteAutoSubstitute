@@ -9,7 +9,7 @@ internal static class SubstituteExtensions
 {
     internal static object CreateExceptionThrowingSubstitute(this Type type)
     {
-        var exceptionThrowingMock = Substitute.For(new[] { type }, Array.Empty<object>());
+        var exceptionThrowingSubstitute = Substitute.For(new[] { type }, Array.Empty<object>());
 
         //All Methods
         foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m => !m.IsSpecialName))
@@ -20,10 +20,10 @@ internal static class SubstituteExtensions
                 .Select(p => typeof(Arg)
                     .GetMethod(nameof(Arg.Any))!
                     .MakeGenericMethod(p.ParameterType)
-                    .Invoke(exceptionThrowingMock, Array.Empty<object>()))
+                    .Invoke(exceptionThrowingSubstitute, Array.Empty<object>()))
                 .ToArray();
 
-            exceptionThrowingMock
+            exceptionThrowingSubstitute
                 .When(x => { method.Invoke(x, parameters); })
                 .Do(_ => throw new AutoSubstituteException(exceptionMessage));
         }
@@ -35,19 +35,19 @@ internal static class SubstituteExtensions
 
             if (property.GetMethod is not null)
             {
-                exceptionThrowingMock
+                exceptionThrowingSubstitute
                     .When(x => { property.GetMethod.Invoke(x, Array.Empty<object>()); })
                     .Do(_ => throw new AutoSubstituteException(exceptionMessage));
             }
 
             if (property.SetMethod is not null)
             {
-                exceptionThrowingMock
+                exceptionThrowingSubstitute
                     .When(x => { property.SetMethod.Invoke(x, Array.Empty<object>()); })
                     .Do(_ => throw new AutoSubstituteException(exceptionMessage));
             }
         }
 
-        return exceptionThrowingMock;
+        return exceptionThrowingSubstitute;
     }
 }
