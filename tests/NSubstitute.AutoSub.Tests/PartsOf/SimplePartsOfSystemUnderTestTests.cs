@@ -18,7 +18,7 @@ public class SimplePartsOfSystemUnderTestTests
         var result = sut.Invoke();
 
         //Assert
-        Assert.Equal(result, SimplePartsOfPartsOfDependency.NonMockedText);
+        Assert.Empty(result);
     }
     
     [Fact]

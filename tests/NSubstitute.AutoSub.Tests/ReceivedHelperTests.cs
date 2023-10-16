@@ -27,7 +27,7 @@ public class ReceivedHelperTests
     public void ReceivedOnce_WhenCalledWithNoParametersAndManualWithNullsBehaviour_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = $"Could not find mocked service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
+        var expectedMessage = $"Could not find substituted service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
 
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
         
@@ -45,7 +45,7 @@ public class ReceivedHelperTests
     public void ReceivedOnce_WhenCalledWithNoParametersAndManualWithExceptionsBehaviour_WillThrowAutoSubstituteException()
     {
         //Arrange
-        var expectedMessage = $"Could not find mocked service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
+        var expectedMessage = $"Could not find substituted service. Substitute behaviour is a 'Manual' behaviour, so unless you have explicitly utilised the '{nameof(IReceivedHelperTestClassDependency)}' type or utilise 'Use'/'UseCollection', the dependency cannot be checked via this method.";
 
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithExceptions);
         
