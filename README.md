@@ -29,11 +29,13 @@ Assert.Equal("Test Text", result);
 ```
 
 ### Tracking Dependencies
-Unless the behaviour of `AutoSubstitute` is changed (see [behaviours](#behaviours)), the first time that a dependency is required/interacted with, it is created and subsequently tracked by `AutoSubstitute`. This means that anytime in future when you ask `AutoSubstitute` for a dependency, it will return the same instance everytime.
+Unless the behaviour of `AutoSubstitute` is changed (see [behaviours](#behaviours)), the first time that a dependency is required/interacted with, it is created and subsequently tracked by `AutoSubstitute`. This means that anytime in future when you ask `AutoSubstitute` for a dependency, it will return the same instance everytime. 
 
 This instance is created when:
-- `SubstituteFor`/`SubstituteForPartsOf` is called before you call `CreateInstance` for the first time for a system that uses the instance you are mocking/substituting
-- `CreateInstance` is called prior to calling `SubstituteFor`/`SubstituteForPartsOf` and it is required in the constructor of the system you wish to test
+- `SubstituteFor`/`SubstituteForPartsOf` is invoked prior to calling `CreateInstance` for a system you are attempting to test 
+- `CreateInstance` is invoked prior to calling `SubstituteFor`/`SubstituteForPartsOf` and it is required in the constructor of the system you wish to test
+
+This ensures that when it comes time to `CreateInstance` being invoked, the dependencies that you have mocked/stubbed are the same ones that are injected into the constructors of any systems you are testing.
 
 You can create subsitute instances without having `AutoSubstitute` track them. To do this, pass in a `noTracking` parameter when creating a substitute/mock or use `SubstituteForNoTracking`
 ```csharp
