@@ -14,7 +14,7 @@ internal static class SubstituteExtensions
         //All Methods
         foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m => !m.IsSpecialName))
         {
-            var exceptionMessage = $"Mock has not been configured for '{type.Name}' when method '{method.Name}' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+            var exceptionMessage = $"Substitute has not been configured for '{type.Name}' when method '{method.Name}' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
             var parameters = method
                 .GetParameters()
                 .Select(p => typeof(Arg)
@@ -31,7 +31,7 @@ internal static class SubstituteExtensions
         //All Props
         foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            var exceptionMessage = $"Mock has not been configured for '{type.Name}' when property '{property.Name}' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+            var exceptionMessage = $"Substitute has not been configured for '{type.Name}' when property '{property.Name}' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
 
             if (property.GetMethod is not null)
             {

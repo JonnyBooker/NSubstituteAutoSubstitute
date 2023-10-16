@@ -53,7 +53,7 @@ public class CollectionSystemsUnderTestManualWithExceptionsTests
     public void CollectionSystemUnderTestInstances_WhenUsedAndNoDependencyMockedPriorToCreate_WillThrowAutoSubstituteException(Type value)
     {
         //Arrange
-        var expectedMessage = "Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.";
+        var expectedMessage = "Substitute has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the substitute must be created before 'CreateInstance' is called.";
         
         //Act
         var sut = (ICollectionSystemUnderTest) AutoSubstitute.CreateInstance(value);

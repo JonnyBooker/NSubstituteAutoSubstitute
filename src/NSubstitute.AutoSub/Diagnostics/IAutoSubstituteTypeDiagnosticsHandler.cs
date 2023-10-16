@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 namespace NSubstitute.AutoSub.Diagnostics;
 
 /// <summary>
-/// Handler which tracks the creation of substitutes and mocks so that problems can potentially be diagnosed
+/// Handler which tracks the creation of substitutes so that problems can potentially be diagnosed
 /// </summary>
 public interface IAutoSubstituteTypeDiagnosticsHandler
 {
@@ -16,7 +16,7 @@ public interface IAutoSubstituteTypeDiagnosticsHandler
     event EventHandler<AutoSubstituteDiagnosticLogEventArgs> DiagnosticLogAdded;
         
     /// <summary>
-    /// Diagnostic messages broken down by Type with messages about the creation of substitutes/mocks for that type
+    /// Diagnostic messages broken down by Type with messages about the creation of substitutes for that type
     /// </summary>
     IReadOnlyDictionary<Type, ReadOnlyCollection<string>> DiagnosticMessages { get; }
 }

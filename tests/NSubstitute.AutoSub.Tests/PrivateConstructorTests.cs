@@ -49,7 +49,7 @@ public class PrivateConstructorTests
     public void PrivateConstructor_WhenCalledWithManualWithNulls_WillThrowAutoSubstituteException()
     {
         //Arrange
-        const string expectedException =  "Unable to find suitable constructor. You are using 'Manual with Nulls' behaviour mode, a mock must be created for the method before the system under test instance is created. Alternatively, use an 'Automatic' behaviour mode or you can use 'usePrivateConstructors' when 'AutoSubstitute' is created.";
+        const string expectedException =  "Unable to find suitable constructor. You are using 'Manual with Nulls' behaviour mode, a substitute must be created for the method before the system under test instance is created. Alternatively, use an 'Automatic' behaviour mode or you can use 'usePrivateConstructors' when 'AutoSubstitute' is created.";
 
         var autoSubstitute = new AutoSubstitute(SubstituteBehaviour.ManualWithNulls);
 
