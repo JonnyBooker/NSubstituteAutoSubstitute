@@ -1,19 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <OutputType>Library</OutputType>
         <Nullable>enable</Nullable>
         <RootNamespace>NSubstitute.AutoSub</RootNamespace>
         <LangVersion>latest</LangVersion>
-        <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
+        <Copyright>Copyright Jonny Booker $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Authors>Jonny Booker</Authors>
-        <PackageId>NSubstitute.AutoSubtitute</PackageId>
+        <PackageId>NSubstitute.AutoSubtitute.ServiceProvider</PackageId>
         <PackageDescription>An auto-substitute/mock generating container that creates mocks using NSubstitute</PackageDescription>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/jonnybooker/NSubstitute.AutoSubstitute</PackageProjectUrl>
-        
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <Tags>nsubstitute;automocking;autosubstitute;testing;TDD</Tags>
+                
         <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">1.0.0</VersionPrefix>
     </PropertyGroup>
 
