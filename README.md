@@ -1,5 +1,5 @@
 # NSubstitute.AutoSubstitute
-This package is an automocking container for [NSubstitute](https://nsubstitute.github.io/). The purpose of this project is to try and decouple unit tests from the constructors of your systems under test making them less brittle as changes are made throughout your codebase but still enabling tests to pass/fail as expected.
+This package is an auto-substitute/mock container for [NSubstitute](https://nsubstitute.github.io/). The purpose of this project is to try and decouple unit tests from the constructors of your systems under test making them less brittle as changes are made throughout your codebase but still enabling tests to pass/fail as expected.
 
 Inspiration was taken from [AutoMocker](https://github.com/moq/Moq.AutoMocker) library which offers similar functionality to this library, but for Moq. It has been born out of using [NSubstitute](https://nsubstitute.github.io/) and wanting a similar workflow to be available.
 
@@ -210,7 +210,7 @@ AutoSubstitute
     ```
 
 ## Building
-AutoSubstitute and its supporting tests have been developed using Rider, however it should be compabile with Visual Studio. The solution can be found in the root of this repository.
+AutoSubstitute and its supporting tests have been developed using [Rider](https://www.jetbrains.com/rider/), however it should be compabile with Visual Studio. The solution file can be found in the root of this repository.
 
 ## Acknowledgements
 - [NSubstitute](https://nsubstitute.github.io/): A friendly substitute for .NET mocking libraries. This framework is built around NSubstitute as a base for testing and wouldn't exist if not for it.
