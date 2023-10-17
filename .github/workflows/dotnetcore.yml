@@ -41,7 +41,7 @@ jobs:
         }
         else {
           <# All other pushes get a "beta" suffix #>
-          $env:VersionSuffix = 'beta-{0:00}' -f ${{ github.run_number }}
+          $env:VersionSuffix = 'beta-{0:0000}' -f ${{ github.run_number }}
         }
 
         dotnet pack --configuration Release --output .
