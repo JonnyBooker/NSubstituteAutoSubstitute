@@ -40,8 +40,8 @@ jobs:
           }
         }
         else {
-          <# All other pushes get a "alpha" suffix #>
-          $env:VersionSuffix = 'alpha-{0:00}' -f ${{ github.run_number }}
+          <# All other pushes get a "beta" suffix #>
+          $env:VersionSuffix = 'beta-{0:00}' -f ${{ github.run_number }}
         }
 
         dotnet pack --configuration Release --output .
