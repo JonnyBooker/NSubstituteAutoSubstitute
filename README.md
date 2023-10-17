@@ -1,5 +1,5 @@
 # NSubstitute.AutoSubstitute
-[![Continuous Deployment Status](https://github.com/JonnyBooker/NSubstitute.AutoSubstitute/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/JonnyBooker/NSubstitute.AutoSubstitute/actions/workflows/dotnetcore.yml) [![NuGet Status](https://img.shields.io/nuget/v/NSubstitute.AutoSubstitute.svg?style=flat)](https://www.nuget.org/packages/NSubstitute.AutoSubstitute)
+[![Continuous Build Workflow](https://github.com/JonnyBooker/NSubstitute.AutoSubstitute/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/JonnyBooker/NSubstitute.AutoSubstitute/actions/workflows/dotnetcore.yml) [![NuGet Status](https://img.shields.io/nuget/v/NSubstituteAutoSubstitute.svg?style=flat)](https://www.nuget.org/packages/NSubstituteAutoSubstitute)
 
 This package is an auto-substitute/mock container for [NSubstitute](https://nsubstitute.github.io/). The purpose of this project is to try and decouple unit tests from the constructors of your systems under test making them less brittle as changes are made throughout your codebase but still enabling tests to pass/fail as expected.
 
