@@ -9,6 +9,7 @@
         <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Authors>Jonny Booker</Authors>
+        <PackageId>NSubstitute.AutoSubtitute</PackageId>
         <PackageDescription>An auto-substitute/mock generating container that creates mocks using NSubstitute</PackageDescription>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/jonnybooker/NSubstitute.AutoSubstitute</PackageProjectUrl>
