@@ -1,9 +1,8 @@
 # Aspects of this code have been sourced from: https://github.com/moq/Moq.AutoMocker/blob/master/.github/workflows/dotnetcore.yml
-name: Continuous
+name: Continuous Build Workflow
 
 on:
-  pull_request:
-  
+  pull_request:  
   push:
     branches: [ main ]
     tags:
