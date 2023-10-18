@@ -13,7 +13,7 @@ Here is a simple example to get you started on the right path:
 var autoSubstitute = new AutoSubstitute();
 
 //Get a mock from AutoSubstitute (you can get this before or after an instance is created)
-var dependencyService = autoSubstitute.SubstituteFor<ITextGenerationDependency>();
+var dependencyService = autoSubstitute.GetSubstituteFor<ITextGenerationDependency>();
 
 //From here you can use NSubstitute as usual
 dependencyService
@@ -35,35 +35,34 @@ You can create substitutes using `For` and `ForPartsOf` in AutoSubstitute. Pleas
 ```csharp
 //NSubstitute 'For'
 var dependency = Substitute.For<IDependency>();
-var dependency = AutoSubstitute.SubstituteFor<IDependency>();
+var dependency = AutoSubstitute.GetSubstituteFor<IDependency>();
 
 //NSubstitute 'ForPartsOf'
 var dependency = Substitute.ForPartsOf<IDependency>();
-var dependency = AutoSubstitute.SubstituteForPartsOf<IDependency>();
+var dependency = AutoSubstitute.GetSubstituteForPartsOf<IDependency>();
 ```
 
 ### Tracking Dependencies
 Unless the behaviour of `AutoSubstitute` is changed (see [behaviours](#behaviours)), the first time that a dependency is required/interacted with, it is created and subsequently tracked by `AutoSubstitute`. This means that anytime in future when you ask `AutoSubstitute` for a dependency, it will return the same instance everytime. 
 
 This instance is created when:
-- `SubstituteFor`/`SubstituteForPartsOf` is invoked prior to calling `CreateInstance` for a system you are attempting to test 
-- `CreateInstance` is invoked prior to calling `SubstituteFor`/`SubstituteForPartsOf` and it is required in the constructor of the system you wish to test
+- `GetSubstituteFor`/`GetSubstituteForPartsOf` is invoked prior to calling `CreateInstance` for a system you are attempting to test 
+- `CreateInstance` is invoked prior to calling `GetSubstituteFor`/`GetSubstituteForPartsOf` and it is required in the constructor of the system you wish to test
 
 This ensures that when it comes time to `CreateInstance` being invoked, the dependencies that you have mocked/stubbed are the same ones that are injected into the constructors of any systems you are testing.
 
-You can create substitute instances without having `AutoSubstitute` track them. To do this, pass in a `noTracking` parameter when creating a substitute/mock or use `SubstituteForNoTracking`
+You can create substitute instances without having `AutoSubstitute` track them. To do this, use the following methods:
 ```csharp
 //Create the AutoSubsitute instance
 var autoSubstitute = new AutoSubstitute();
 
-//-- Option #1: Via parameter
-autoSubstitute.SubstituteFor<ITextGenerationDependency>(noTracking: true);
-
-//-- Option #2: Via method
-autoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
+//Call one of the "NoTracking" methods
+autoSubstitute.GetSubstituteForNoTracking<ITextGenerationDependency>();
+autoSubstitute.GetSubstituteForPartsOfNoTracking<TextGenerationDependency>();
 ```
 
-**Important Note:** Please note that should you change between using `SubstituteFor`/ `SubstituteForPartsOf`/ `Use`/ `UseCollection`, a exception will be thrown. This has been done to ensure the substitute created remains the same throughout its lifetime.  
+**Important Note:** Please note that should you change between using `GetSubstituteFor`/ `GetSubstituteForPartsOf`, a exception will be thrown. This has been done to ensure the substitute created remains the same throughout its lifetime. When using
+`Use`/`UseCollection`, the instance created here will take precedence over any substitute previously created and will always be returned when using `GetSubstituteFor`/ `GetSubstituteForPartsOf`. 
 
 ### Mocking Collections
 You might come across a scenario where a collection is being used as a dependency. In which case, you have several options to potentially use:
@@ -74,7 +73,7 @@ var autoSubstitute = new AutoSubstitute();
 //-- Option #1
 //If you only intend to use one mock as part of the collection of dependencies, you can use AutoSubstitute as you normally would for mocking a single dependency
 //When the collection of dependencies is created, the single mocked dependency will be wrapped in a collection and injected
-var multipleDependency = autoSubstitute.SubstituteFor<IMultipleDependency>();
+var multipleDependency = autoSubstitute.GetSubstituteFor<IMultipleDependency>();
 
 //Mock as you wish
 multipleDependency
@@ -83,8 +82,8 @@ multipleDependency
 
 //-- Option #2
 //If you want to have multiple mock dependencies injected. You can create a substitute that will not be tracked by AutoSubstitute and just create a plain old substitute/mock
-var multipleDependency1 = autoSubstitute.SubstituteFor<IMultipleDependency>(noTracking: true);
-var multipleDependency2 = autoSubstitute.SubstituteForNoTracking<IMultipleDependency>();
+var multipleDependency1 = autoSubstitute.GetSubstituteFor<IMultipleDependency>(noTracking: true);
+var multipleDependency2 = autoSubstitute.GetSubstituteForNoTracking<IMultipleDependency>();
 
 //Mock each dependency as you wish
 multipleDependency1
@@ -140,7 +139,7 @@ Built into AutoSubstitute are 3 different behaviour types you can use. These beh
 The specifics of each behaviour are as follows:
 - **Automatic (Default)**
   - This is the `default` behaviour of this framework. 
-  - Any mock/substitute that is used, whether requested via `SubstituteFor`/`SubstitutePartsFor` or if it created as part of a constructor when `CreateInstance` is called will only be created once.
+  - Any mock/substitute that is used, whether requested via `GetSubstituteFor`/`SubstitutePartsFor` or if it created as part of a constructor when `CreateInstance` is called will only be created once.
   - Automatically created dependencies will always use `Substitute.For` 
 - **Manual with Nulls**
   - Enabled via passing in `SubstituteBehaviour.ManualWithNulls` via the constructor for `AutoSubstitute`:
@@ -158,7 +157,7 @@ The specifics of each behaviour are as follows:
   - Any dependency that is not created/tracked prior to calling `CreateInstance` will be created as a "exception throwing mock". What this means is, a mock instance will be created but every property/method will throw an exception when called. However it will give a informative message as to what exactly hasn't been mocked to the user, e.g.
     > Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.
   - This will only work with **interface** dependencies. This is because in the case of a class, it is difficult to assume what should and shouldn't be mocked to throw a exception.
-  - If a dependency is requested via `SubstituteFor`/`SubstitutePartsFor` then the exception throwing mock will be replaced and it will be tracked for future use.
+  - If a dependency is requested via `GetSubstituteFor`/`SubstitutePartsFor` then the exception throwing mock will be replaced and it will be tracked for future use.
 
 ### Received Helpers
 Helpers have been provided to be able to carry out verifications to ensure dependency invocations have or haven't taken place. This is just syntactic sugar to try simplify the process of verification but you are free to just use NSubstitute `Received` style extensions if you wish.

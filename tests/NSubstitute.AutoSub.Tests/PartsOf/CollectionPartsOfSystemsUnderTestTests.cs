@@ -28,8 +28,8 @@ public class CollectionPartsOfSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var mockInstance1 = AutoSubstitute.SubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
-        var mockInstance2 = AutoSubstitute.SubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
+        var mockInstance1 = AutoSubstitute.GetSubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
+        var mockInstance2 = AutoSubstitute.GetSubstituteForPartsOfNoTracking<SimplePartsOfPartsOfDependency>();
 
         mockInstance1
             .PartsOfInvoke()
@@ -49,12 +49,12 @@ public class CollectionPartsOfSystemsUnderTestTests
 
     [Theory]
     [MemberData(nameof(CollectionData))]
-    public void CollectionSystemUnderTest_WhenUsingSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue(Type value)
+    public void CollectionSystemUnderTest_WhenUsingGetSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue(Type value)
     {
         //Arrange
         var expectedValue = Fixture.Create<string>();
 
-        var mockInstance = AutoSubstitute.SubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
+        var mockInstance = AutoSubstitute.GetSubstituteForPartsOf<SimplePartsOfPartsOfDependency>();
 
         mockInstance
             .PartsOfInvoke()

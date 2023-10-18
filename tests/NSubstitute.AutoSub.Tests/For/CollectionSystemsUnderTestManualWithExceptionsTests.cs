@@ -29,8 +29,8 @@ public class CollectionSystemsUnderTestManualWithExceptionsTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
+        var instance1 = AutoSubstitute.GetSubstituteForNoTracking<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.GetSubstituteForNoTracking<ITextGenerationDependency>();
 
         instance1
             .Generate()

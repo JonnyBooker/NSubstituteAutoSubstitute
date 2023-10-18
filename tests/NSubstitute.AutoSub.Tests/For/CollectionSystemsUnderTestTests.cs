@@ -29,8 +29,8 @@ public class CollectionSystemsUnderTestTests
         var item1 = Fixture.Create<string>();
         var item2 = Fixture.Create<string>();
 
-        var instance1 = AutoSubstitute.SubstituteFor<ITextGenerationDependency>();
-        var instance2 = AutoSubstitute.SubstituteForNoTracking<ITextGenerationDependency>();
+        var instance1 = AutoSubstitute.GetSubstituteFor<ITextGenerationDependency>();
+        var instance2 = AutoSubstitute.GetSubstituteForNoTracking<ITextGenerationDependency>();
 
         instance1
             .Generate()
@@ -50,12 +50,12 @@ public class CollectionSystemsUnderTestTests
 
     [Theory]
     [MemberData(nameof(CollectionData))]
-    public void CollectionSystemUnderTest_WhenUsingSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue(Type value)
+    public void CollectionSystemUnderTest_WhenUsingGetSubstituteForEnumerableOnce_ReturnsOnlySubstitutedMockedValue(Type value)
     {
         //Arrange
         var item = Fixture.Create<string>();
 
-        var instance = AutoSubstitute.SubstituteFor<ITextGenerationDependency>();
+        var instance = AutoSubstitute.GetSubstituteFor<ITextGenerationDependency>();
 
         instance
             .Generate()

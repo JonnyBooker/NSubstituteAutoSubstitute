@@ -18,7 +18,7 @@ public class SimpleSystemUnderTestManualWithNullsTests
         var expectedValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         
@@ -38,12 +38,12 @@ public class SimpleSystemUnderTestManualWithNullsTests
         var expectedNumberValue = Fixture.Create<int>();
         
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedTextValue);
 
         AutoSubstitute
-            .SubstituteFor<INumberGenerationDependency>()
+            .GetSubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(expectedNumberValue);
         
@@ -75,7 +75,7 @@ public class SimpleSystemUnderTestManualWithNullsTests
         var expectedValue = Fixture.Create<string>();
         
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedValue);
         

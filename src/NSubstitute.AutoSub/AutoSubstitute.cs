@@ -117,40 +117,48 @@ public class AutoSubstitute : IServiceProvider
     }
 
     /// <summary>
-    /// Searches or creates a substitute that a system under test can use that is not
-    /// cached and is newly created everytime.
+    /// Searches or creates a substitute that a system under test can use that is not cached and is newly created
+    /// everytime.
     /// Underneath this will use <see cref="Substitute.For{T}"/>.
     /// </summary>
+    /// <param name="constructorArguments">Arguments required to construct a class being substituted. Not required for interfaces or classes with default constructors.</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForNoTracking<T>() where T : class => SubstituteFor<T>(true);
+    public T GetSubstituteForNoTracking<T>(params object[] constructorArguments) where T : class => 
+        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(constructorArguments), SubstituteType.For, true);
 
     /// <summary>
-    /// Searches or creates a substitute that a system under test can use that is not
-    /// cached and is newly created everytime.
+    /// Searches or creates a substitute that a system under test can use that is not cached and is newly created
+    /// everytime. Note these arguments will only be passed once when the substitute is first created.
     /// Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
     /// </summary>
+    /// <param name="constructorArguments">Arguments required to construct a class being substituted. Not required for interfaces or classes with default constructors.</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForPartsOfNoTracking<T>() where T : class => SubstituteForPartsOf<T>(true);
+    public T GetSubstituteForPartsOfNoTracking<T>(params object[] constructorArguments) where T : class =>
+        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(constructorArguments), SubstituteType.For, true);
 
     /// <summary>
-    /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.For{T}"/>.
+    /// Searches or creates a substitute that a system under test can use. Note any constructor arguments passed
+    /// will only be passed once when the substitute is first created.
+    /// Underneath this will use <see cref="Substitute.For{T}"/>.
     /// </summary>
-    /// <param name="noTracking">Option if want to create an instance that is newly created and not be tracked and used by AutoSubstitute in further interactions</param>
+    /// <param name="constructorArguments">Arguments required to construct a class being substituted. Not required for interfaces or classes with default constructors.</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteFor<T>(bool noTracking = false) where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.For<T>(), SubstituteType.For, noTracking);
+    public T GetSubstituteFor<T>(params object[] constructorArguments) where T : class =>
+        (T) CreateSubstitute(typeof(T), () => Substitute.For<T>(constructorArguments), SubstituteType.For);
 
     /// <summary>
-    /// Searches or creates a substitute that a system under test can use. Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
+    /// Searches or creates a substitute that a system under test can use. Note any constructor arguments passed
+    /// will only be passed once when the substitute is first created.
+    /// Underneath this will use <see cref="Substitute.ForPartsOf{T}"/>.
     /// </summary>
-    /// <param name="noTracking">Option if want to create an instance that is newly created and not be tracked and used by AutoSubstitute in further interactions</param>
+    /// <param name="constructorArguments">Arguments required to construct a class being substituted. Not required for interfaces or classes with default constructors.</param>
     /// <typeparam name="T">The class or interface to search</typeparam>
     /// <returns>A substitute for the specified class or interface</returns>
-    public T SubstituteForPartsOf<T>(bool noTracking = false) where T : class =>
-        (T)CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(), SubstituteType.ForPartsOf, noTracking);
+    public T GetSubstituteForPartsOf<T>(params object[] constructorArguments) where T : class =>
+        (T) CreateSubstitute(typeof(T), () => Substitute.ForPartsOf<T>(constructorArguments), SubstituteType.ForPartsOf);
 
     /// <summary>
     /// Forces a specific type instance to be used over creating a substituted instance automatically
@@ -419,10 +427,10 @@ public class AutoSubstitute : IServiceProvider
         if (TryGetService(type, out var substituteTypeObject))
         {
             //Substitutes have been created using mixed methods, throw an exception and advise
-            if (substituteTypeObject.SubstituteType != substituteType)
+            if (substituteTypeObject.SubstituteType != SubstituteType.Manual && substituteTypeObject.SubstituteType != substituteType)
             {
-                _diagnosticsHandler.AddDiagnosticMessagesForType(type, $"Substitute type has been created using mixed means. Only one of these should be used, e.g. {nameof(SubstituteFor)}/{nameof(SubstituteForPartsOf)}/{nameof(Use)}/{nameof(UseCollection)}");
-                throw new AutoSubstituteException($"Substitute type '{type.Name}' has been created using mixed means. Only one of these (e.g. {nameof(SubstituteFor)}/{nameof(SubstituteForPartsOf)}/{nameof(Use)}/{nameof(UseCollection)}) should be used when testing to avoid confusion of which should be used.");
+                _diagnosticsHandler.AddDiagnosticMessagesForType(type, $"Substitute type has been created using mixed methods. Only one of these should be used, e.g. {nameof(GetSubstituteFor)}/{nameof(GetSubstituteForPartsOf)}/{nameof(Use)}/{nameof(UseCollection)}");
+                throw new AutoSubstituteException($"Substitute type '{type.Name}' has been created using mixed methods. Only one of these (e.g. {nameof(GetSubstituteFor)}/{nameof(GetSubstituteForPartsOf)}/{nameof(Use)}/{nameof(UseCollection)}) should be used when testing to avoid confusion of which should be used.");
             }
             
             _diagnosticsHandler.AddDiagnosticMessagesForType(type, "Existing substitute found. Will use this!");

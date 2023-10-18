@@ -19,7 +19,7 @@ public class SimpleSystemUnderTestTests
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
@@ -39,12 +39,12 @@ public class SimpleSystemUnderTestTests
         var intValue = Fixture.Create<int>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         AutoSubstitute
-            .SubstituteFor<INumberGenerationDependency>()
+            .GetSubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(intValue);
 
@@ -64,7 +64,7 @@ public class SimpleSystemUnderTestTests
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
@@ -84,12 +84,12 @@ public class SimpleSystemUnderTestTests
         var intValue = Fixture.Create<int>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 
         AutoSubstitute
-            .SubstituteFor<INumberGenerationDependency>()
+            .GetSubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(intValue);
 
@@ -115,32 +115,13 @@ public class SimpleSystemUnderTestTests
     }
 
     [Fact]
-    public void SimpleSystemUnderTest_WhenUsingNoTrackingParameter_WillNotUseMockedVersion()
-    {
-        //Arrange
-        var stringValue = Fixture.Create<string>();
-
-        AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>(noTracking: true)
-            .Generate()
-            .Returns(stringValue);
-
-        //Act
-        var sut = AutoSubstitute.CreateInstance<SimpleSystemUnderTest>();
-        var result = sut.GenerateText();
-
-        //Assert
-        Assert.Empty(result);
-    }
-
-    [Fact]
     public void SimpleSystemUnderTest_WhenUsingNoTrackingSubstitute_WillNotUseMockedVersion()
     {
         //Arrange
         var stringValue = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteForNoTracking<ITextGenerationDependency>()
+            .GetSubstituteForNoTracking<ITextGenerationDependency>()
             .Generate()
             .Returns(stringValue);
 

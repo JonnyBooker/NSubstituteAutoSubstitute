@@ -33,7 +33,7 @@ public class PrivateConstructorTests
         var autoSubstitute = new AutoSubstitute(usePrivateConstructors: true);
 
         autoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(expectedText);
 
