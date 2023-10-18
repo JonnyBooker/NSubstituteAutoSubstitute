@@ -30,7 +30,7 @@ public class SimplePartsOfSystemUnderTestManualWithNullsTests
         var value = Fixture.Create<string>();
         
         AutoSubstitute
-            .SubstituteForPartsOf<SimplePartsOfPartsOfDependency>()
+            .GetSubstituteForPartsOf<SimplePartsOfPartsOfDependency>()
             .PartsOfInvoke()
             .Returns(value);
 

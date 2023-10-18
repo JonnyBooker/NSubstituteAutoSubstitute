@@ -6,12 +6,12 @@
 internal enum SubstituteType
 {
     /// <summary>
-    /// Created via <see cref="AutoSubstitute.SubstituteFor{T}"/>
+    /// Created via <see cref="AutoSubstitute.GetSubstituteFor{T}"/>
     /// </summary>
     For,
     
     /// <summary>
-    /// Created via <see cref="AutoSubstitute.SubstituteForPartsOf{T}"/>
+    /// Created via <see cref="AutoSubstitute.GetSubstituteForPartsOf{T}"/>
     /// </summary>
     ForPartsOf,
     

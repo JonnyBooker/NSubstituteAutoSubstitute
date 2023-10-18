@@ -18,7 +18,7 @@ public class ServiceProviderTests
         var expectedString = Fixture.Create<string>();
 
         AutoSubstitute
-            .SubstituteFor<IServiceProviderTextGenerationDependency>()
+            .GetSubstituteFor<IServiceProviderTextGenerationDependency>()
             .Generate()
             .Returns(expectedString);
         

@@ -17,12 +17,12 @@ public class MultipleConstructorTests
         var number = Fixture.Create<int>();
 
         AutoSubstitute
-            .SubstituteFor<ITextGenerationDependency>()
+            .GetSubstituteFor<ITextGenerationDependency>()
             .Generate()
             .Returns(text);
 
         AutoSubstitute
-            .SubstituteFor<INumberGenerationDependency>()
+            .GetSubstituteFor<INumberGenerationDependency>()
             .Generate()
             .Returns(number);
         
