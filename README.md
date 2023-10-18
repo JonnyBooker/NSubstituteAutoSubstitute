@@ -31,7 +31,7 @@ Assert.Equal("Test Text", result);
 ```
 
 ### Methods For Mocking
-You can create substitutes using `For` and `ForPartsOf` in AutoSubstitute. Please follow the [warning from NSubstitutes](https://nsubstitute.github.io/help/creating-a-substitute/#substituting-infrequently-and-carefully-for-classes) when using PartsOf.  
+You can create substitutes using `For` and `ForPartsOf` in AutoSubstitute. Please follow the [warning from NSubstitutes](https://nsubstitute.github.io/help/creating-a-substitute/#substituting-infrequently-and-carefully-for-classes) when using classes not interfaces.
 ```csharp
 //NSubstitute 'For'
 var dependency = Substitute.For<IDependency>();
