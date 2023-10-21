@@ -82,7 +82,7 @@ multipleDependency
 
 //-- Option #2
 //If you want to have multiple mock dependencies injected. You can create a substitute that will not be tracked by AutoSubstitute and just create a plain old substitute/mock
-var multipleDependency1 = autoSubstitute.GetSubstituteFor<IMultipleDependency>(noTracking: true);
+var multipleDependency1 = autoSubstitute.GetSubstituteForNoTracking<IMultipleDependency>();
 var multipleDependency2 = autoSubstitute.GetSubstituteForNoTracking<IMultipleDependency>();
 
 //Mock each dependency as you wish
@@ -138,7 +138,8 @@ Built into AutoSubstitute are 3 different behaviour types you can use. These beh
 
 The specifics of each behaviour are as follows:
 - **Automatic (Default)**
-  - This is the `default` behaviour of this framework. 
+  - This is the `default` behaviour of this framework.
+  - This is the default as it gives you "raw" NSubstitute without changing any of the behaviour NSubstitute in any way and it is the quickest option to get up and running/testing with the least amount of effort.
   - Any mock/substitute that is used, whether requested via `GetSubstituteFor`/`SubstitutePartsFor` or if it created as part of a constructor when `CreateInstance` is called will only be created once.
   - Automatically created dependencies will always use `Substitute.For` 
 - **Manual with Nulls**
@@ -157,7 +158,7 @@ The specifics of each behaviour are as follows:
   - Any dependency that is not created/tracked prior to calling `CreateInstance` will be created as a "exception throwing mock". What this means is, a mock instance will be created but every property/method will throw an exception when called. However it will give a informative message as to what exactly hasn't been mocked to the user, e.g.
     > Mock has not been configured for 'ITextGenerationDependency' when method 'Generate' was invoked. When using a 'Manual' behaviour, the mock must be created before 'CreateInstance' is called.
   - This will only work with **interface** dependencies. This is because in the case of a class, it is difficult to assume what should and shouldn't be mocked to throw a exception.
-  - If a dependency is requested via `GetSubstituteFor`/`SubstitutePartsFor` then the exception throwing mock will be replaced and it will be tracked for future use.
+  - If a dependency is requested via `GetSubstituteFor`/`GetSubstitutePartsFor` then the exception throwing mock will be replaced and it will be tracked for future use.
 
 ### Received Helpers
 Helpers have been provided to be able to carry out verifications to ensure dependency invocations have or haven't taken place. This is just syntactic sugar to try simplify the process of verification but you are free to just use NSubstitute `Received` style extensions if you wish.
