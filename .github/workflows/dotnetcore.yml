@@ -2,7 +2,13 @@
 name: Continuous Build Workflow
 
 on:
-  pull_request:
+  pull_request:  
+  push:
+    branches: [ main ]
+    tags:
+    - 'v*'
+    paths-ignore:
+    - 'README.md'
 
 defaults:
   run:
@@ -14,6 +20,7 @@ jobs:
     permissions:
       pull-requests: write
       contents: read
+      packages: write
 
     steps:
     - uses: actions/checkout@v4
@@ -33,12 +40,30 @@ jobs:
     - name: .NET Test and Collect Coverage
       run: dotnet test --configuration "Release" --collect:"XPlat Code Coverage" --results-directory ./coverage
 
+
+    - name: .NET Pack
+      run: |
+        if ('${{ github.ref }}' -match '^refs/tags/v') {
+          $match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})')
+          if ($match.Success) {
+            $env:VersionPrefix = $match.Groups[1].Value
+          } else {
+            throw 'Invalid tag version: ${{ github.ref }}'
+          }
+        }
+        else {
+          <# All other pushes get a "beta" suffix #>
+          $env:VersionSuffix = 'beta-{0:0000}' -f ${{ github.run_number }}
+        }
+
+        dotnet pack --configuration Release --output .
+
     - name: Generate Report
       run: |
         dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:"MarkdownSummaryGithub;Html"
 
     - name: Upload Code Coverage Report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: coveragereport
         path: ./coverage/coveragereport
@@ -47,7 +72,25 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@v2
       if: github.event_name == 'pull_request'
       with:
-        header: 'Coverage-Report"'
+        header: 'Coverage-Report'
         message: |
           Package Coverage Report
         path: ./coverage/coveragereport/SummaryGithub.md
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: NuGet
+        if-no-files-found: error
+        path: |
+          **/*.nupkg
+          **/*.snupkg
+
+    - name: Publish NuGet and GitHub
+      if: github.event_name == 'push'
+      run: |
+        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+        dotnet nuget push *.nupkg `
+          --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
+          --api-key '${{ secrets.GITHUB_TOKEN }}' `
+          --skip-duplicate
