@@ -49,6 +49,7 @@ jobs:
       if: github.event_name == 'pull_request'
       with:
         header: "Coverage-Report"
-        message: "Package Coverage Report"
+        message: |
+          Package Coverage Report
         recreate: true
         path: ./coverage/coveragereport/SummaryGithub.md
