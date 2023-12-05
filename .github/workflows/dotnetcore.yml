@@ -35,7 +35,7 @@ jobs:
 
     - name: Generate Report
       run: |
-        dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:"MarkdownSummary;Html"
+        dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:"MarkdownSummaryGithub;Html"
 
     - name: Upload code coverage report
       uses: actions/upload-artifact@v2
