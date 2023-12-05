@@ -21,21 +21,31 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
 
-    - name: Install .NET Manifest Tool
-      run: dotnet new tool-manifest
-
-    - name: Install .NET Report Generator Tool
-      run: dotnet tool install dotnet-reportgenerator-globaltool
-
-    - name: Install .NET Coverage Tool
-      run: dotnet tool install dotnet-coverage
+    - name: Install Required Tools
+      run: |
+        dotnet new tool-manifest
+        dotnet tool install dotnet-reportgenerator-globaltool
+        dotnet tool install dotnet-coverage
 
     - name: .NET Build
       run: dotnet build --configuration "Release"
 
-    - name: .NET Test
-      run: dotnet test --configuration "Release" --collect:"XPlat Code Coverage" --results-directory ./coverage
+    - name: Run the unit tests with code coverage
+      run: dotnet coverage collect dotnet test --output ./coverage/coverage.cobertura.xml --output-format cobertura
 
     - name: Generate Report
       run: |
-        dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:MarkdownSummaryGithub
+        dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:"MarkdownSummary;Html"
+
+    - name: Upload code coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coveragereport
+        path: ./coverage/coveragereport
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: ./coverage/coveragereport/Summary.md
