@@ -24,11 +24,11 @@ jobs:
     - name: Install .NET Manifest Tool
       run: dotnet new tool-manifest
 
-    - name: Install .NET Report Generator
-      run: dotnet tool install dotnet-reportgenerator-globaltool --global
+    - name: Install .NET Report Generator Tool
+      run: dotnet tool install dotnet-reportgenerator-globaltool
 
-    - name: Install .NET Report Generator
-      run: dotnet tool install dotnet-coverage --global
+    - name: Install .NET Coverage Tool
+      run: dotnet tool install dotnet-coverage
 
     - name: .NET Build
       run: dotnet build --configuration "Release"
