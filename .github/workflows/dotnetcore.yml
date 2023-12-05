@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-dotnet@v3
 
     - name: Install .NET Manifest Tool
-      run: dotnet new tool-manifest --global
+      run: dotnet new tool-manifest
 
     - name: Install .NET Report Generator
       run: dotnet tool install dotnet-reportgenerator-globaltool --global
