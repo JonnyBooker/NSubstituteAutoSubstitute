@@ -21,11 +21,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
 
-    - name: Install .NET Report Generator
-      run: dotnet tool install dotnet-reportgenerator-globaltool
+    - name: Install .NET Manifest Tool
+      run: dotnet new tool-manifest --global
 
     - name: Install .NET Report Generator
-      run: dotnet tool install dotnet-coverage
+      run: dotnet tool install dotnet-reportgenerator-globaltool --global
+
+    - name: Install .NET Report Generator
+      run: dotnet tool install dotnet-coverage --global
 
     - name: .NET Build
       run: dotnet build --configuration "${{ env.build_configuration }}" /p:IsInTest="${{ env.is_in_test_mode }}"
