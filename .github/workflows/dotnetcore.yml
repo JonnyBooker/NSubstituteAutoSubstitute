@@ -48,4 +48,4 @@ jobs:
       if: github.event_name == 'pull_request'
       with:
         recreate: true
-        path: ./coverage/coveragereport/Summary.md
+        path: ./coverage/coveragereport/SummaryGithub.md
