@@ -31,10 +31,10 @@ jobs:
       run: dotnet tool install dotnet-coverage --global
 
     - name: .NET Build
-      run: dotnet build --configuration "${{ env.build_configuration }}" /p:IsInTest="${{ env.is_in_test_mode }}"
+      run: dotnet build --configuration "Release"
 
     - name: .NET Test
-      run: dotnet test --configuration "${{ env.build_configuration }}" --collect:"XPlat Code Coverage" --results-directory ./coverage /p:IsInTest="${{ env.is_in_test_mode }}"
+      run: dotnet test --configuration "Release" --collect:"XPlat Code Coverage" --results-directory ./coverage
 
     - name: Generate Report
       run: |
