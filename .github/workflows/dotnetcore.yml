@@ -2,13 +2,7 @@
 name: Continuous Build Workflow
 
 on:
-  pull_request:  
-  push:
-    branches: [ main ]
-    tags:
-    - 'v*'
-    paths-ignore:
-    - 'README.md'
+  pull_request:
 
 defaults:
   run:
@@ -18,7 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
+      pull-requests: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -26,40 +21,18 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
 
+    - name: Install .NET Report Generator
+      run: dotnet tool install dotnet-reportgenerator-globaltool
+
+    - name: Install .NET Report Generator
+      run: dotnet tool install dotnet-coverage
+
+    - name: .NET Build
+      run: dotnet build --configuration "${{ env.build_configuration }}" /p:IsInTest="${{ env.is_in_test_mode }}"
+
     - name: .NET Test
-      run: dotnet test --configuration Release
+      run: dotnet test --configuration "${{ env.build_configuration }}" --collect:"XPlat Code Coverage" --results-directory ./coverage /p:IsInTest="${{ env.is_in_test_mode }}"
 
-    - name: .NET Pack
+    - name: Generate Report
       run: |
-        if ('${{ github.ref }}' -match '^refs/tags/v') {
-          $match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})')
-          if ($match.Success) {
-            $env:VersionPrefix = $match.Groups[1].Value
-          } else {
-            throw 'Invalid tag version: ${{ github.ref }}'
-          }
-        }
-        else {
-          <# All other pushes get a "beta" suffix #>
-          $env:VersionSuffix = 'beta-{0:0000}' -f ${{ github.run_number }}
-        }
-
-        dotnet pack --configuration Release --output .
-    
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: NuGet
-        if-no-files-found: error
-        path: |
-          **/*.nupkg
-          **/*.snupkg
-
-    - name: Publish NuGet and GitHub
-      if: github.event_name == 'push'
-      run: |
-        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
-        dotnet nuget push *.nupkg `
-          --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
-          --api-key '${{ secrets.GITHUB_TOKEN }}' `
-          --skip-duplicate
+        dotnet reportgenerator -reports:"**/coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/coveragereport" -reporttypes:MarkdownSummaryGithub
