@@ -79,6 +79,7 @@ public class PrivateConstructorTests
         Assert.Equal(expectedException, exception.Message);
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class PrivateConstructorSystemUnderTest
     {
         private readonly ITextGenerationDependency _textGenerationDependency;

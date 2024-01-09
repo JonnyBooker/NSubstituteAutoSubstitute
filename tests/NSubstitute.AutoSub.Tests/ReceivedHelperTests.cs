@@ -270,6 +270,7 @@ public class ReceivedHelperTests
             .DidNotReceive<IReceivedHelperTestClassDependency>(x => x.CombinedWith(Fixture.Create<string>()));
     }
     
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class ReceivedHelperTestClass
     {
         private readonly IReceivedHelperTestClassDependency _receivedHelperTestClassDependency;

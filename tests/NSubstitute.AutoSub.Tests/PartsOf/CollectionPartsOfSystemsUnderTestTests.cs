@@ -65,7 +65,7 @@ public class CollectionPartsOfSystemsUnderTestTests
         var result = sut.Generate();
 
         //Assert
-        Assert.NotEqual(result, SimplePartsOfPartsOfDependency.NonMockedText);
+        Assert.NotEqual(SimplePartsOfPartsOfDependency.NonMockedText, result);
         Assert.Equal(expectedValue, result);
     }
 }

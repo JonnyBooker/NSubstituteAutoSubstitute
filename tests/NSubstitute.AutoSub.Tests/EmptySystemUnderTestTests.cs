@@ -17,6 +17,7 @@ public class EmptySystemUnderTestTests
         Assert.Equal(EmptySystemUnderTest.GenerateText, result);
     }
     
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class EmptySystemUnderTest
     {
         public const string GenerateText = "Hello World";

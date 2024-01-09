@@ -37,7 +37,7 @@ public class SimplePartsOfSystemUnderTestTests
         var result = sut.Invoke();
 
         //Assert
-        Assert.NotEqual(result, SimplePartsOfPartsOfDependency.NonMockedText);
+        Assert.NotEqual(SimplePartsOfPartsOfDependency.NonMockedText, result);
         Assert.Equal(result, value);
     }
 }
