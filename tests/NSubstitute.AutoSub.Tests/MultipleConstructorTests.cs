@@ -1,4 +1,6 @@
-﻿using AutoFixture;
+﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+using AutoFixture;
 using Xunit;
 
 namespace NSubstitute.AutoSub.Tests;
@@ -34,6 +36,7 @@ public class MultipleConstructorTests
         Assert.Equal($"{text} {number}", result);
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class GreedyConstructorSystemUnderTest
     {
         private readonly ITextGenerationDependency _textGenerationDependency;
